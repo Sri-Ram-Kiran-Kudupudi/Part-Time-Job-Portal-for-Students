@@ -1,0 +1,137 @@
+.applied-jobs-page {
+    background-color: var(--background);
+    min-height: 100vh;
+    padding: 2rem 0 3rem;
+    color: var(--text-dark);
+}
+
+.applied-jobs-page h2 {
+    max-width: 900px;
+    margin: 1.5rem auto;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--secondary);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.btn-back-link {
+    all: unset;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary);
+    padding: 0.5rem;
+}
+
+/* CENTERED MESSAGE */
+.no-jobs-message {
+    text-align: center;
+    margin-top: 4rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+.applied-jobs-list {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.applied-job-card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border-left: 6px solid var(--primary);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.status-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.status-badge {
+    padding: 0.35rem 0.8rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Status Colors */
+.status-accepted { background: #d1fae5; color: #065f46; }
+.status-waiting { background: #fef9c3; color: #a16207; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+.status-pending { background: var(--primary-light); color: var(--primary-dark); }
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+}
+
+/* -------- MODAL OVERLAY -------- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+/* -------- MODAL BOX -------- */
+.modal-box {
+    background: white;
+    width: 420px;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    animation: popIn 0.25s ease;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-box h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-dark);
+}
+
+.modal-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+}

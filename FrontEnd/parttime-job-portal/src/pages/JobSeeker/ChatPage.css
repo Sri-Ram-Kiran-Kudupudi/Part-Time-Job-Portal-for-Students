@@ -1,0 +1,189 @@
+/* ===========================
+    CUSTOM CHAT PAGE UI
+=========================== */
+
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #1d4ed8;
+    --secondary: #c9e6ff;
+    
+    /* CUSTOM LIGHT COLOR FOR CHAT AREA (AliceBlue-like) */
+    --background: #f0f8ff; 
+    
+    /* CUSTOM LIGHT COLOR FOR OTHER USER'S BUBBLE (Off-white) */
+    --bubble-other-bg: #ffffff; 
+
+    --content-max-width: 800px;
+    --padding-base: 1rem;
+    /* New variable for minimum side padding (used to achieve edge-to-edge look) */
+    --page-side-padding: 1rem; 
+
+    --header-height: 64px;
+    /* Input bar content height + desired bottom spacing (20px) */
+    --input-bar-total-height: 90px; 
+    --input-bar-padding-bottom: 20px;
+}
+
+/* PAGE LAYOUT */
+.chat-page-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #e6efff; 
+}
+
+/* MAIN SECTION (The centered chat window) */
+.chat-main-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: var(--content-max-width);
+    width: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+    background: var(--background); 
+}
+
+/* CHAT MESSAGES LIST */
+.messages-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    /* Adjusted side padding to account for the new header/input bar alignment */
+    padding: var(--padding-base); 
+    padding-top: calc(var(--header-height) + 1rem);
+    padding-bottom: var(--input-bar-total-height); 
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; 
+}
+
+/* =====================================
+    FIXED HEADER (Absolute Left Back Button)
+===================================== */
+.fixed-header-full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    background: white;
+    border-bottom: 1px solid var(--secondary);
+    z-index: 20;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chat-header-content {
+    /* Use max() to ensure at least 1rem of padding, but center the content */
+    max-width: calc(var(--content-max-width) + 2 * var(--page-side-padding));
+    width: 100%;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    /* Adjust padding to align button to the absolute start of the centered column */
+    padding: 0 var(--page-side-padding); 
+}
+
+/* 🎯 FIX 1: The back button is now at the start of the centered content area */
+.back-btn {
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    cursor: pointer;
+    margin-right: 0.5rem; 
+    padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.chat-recipient-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333; 
+}
+
+/* =====================================
+    FIXED INPUT BAR (Centered and Not Full-Width Background)
+===================================== */
+.fixed-input-bar-full {
+    /* We make this container fixed and full width to establish the absolute position */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* Remove background, shadow, and border from here */
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    z-index: 10;
+    /* Padding is now applied to the inner form-flex container */
+    padding: 0;
+}
+
+.input-form-flex {
+    max-width: var(--content-max-width);
+    margin: 0 auto; 
+    display: flex;
+    gap: 0.75rem;
+    
+    /* 🎯 FIX 2: Apply the white background, border, shadow, and required padding 
+       to the centered input container itself, achieving the non-full-width effect. */
+    background: white;
+    border-top: 1px solid var(--secondary);
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.06);
+    
+    /* Set horizontal padding for internal elements, and vertical padding for height/gap */
+    padding: 0.8rem var(--page-side-padding) var(--input-bar-padding-bottom) var(--page-side-padding);
+    
+    /* Ensure the input bar sits nicely on the bottom of the page */
+    border-radius: 0; /* Keep it rectangular at the bottom */
+}
+
+/* =====================================
+    CHAT MESSAGE BUBBLES
+===================================== */
+
+.message-row {
+    display: flex;
+    width: 100%; 
+}
+
+.message-row.justify-end { justify-content: flex-end; }
+.message-row.justify-start { justify-content: flex-start; }
+
+.message-bubble {
+    max-width: 75%;
+    padding: 0.6rem 0.9rem; 
+    border-radius: 14px;
+    font-size: 0.95rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    display: flex;
+    flex-direction: column;
+}
+
+.bubble-user {
+    background: var(--primary);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.bubble-other {
+    background: var(--bubble-other-bg); 
+    border: 1px solid var(--secondary);
+    border-bottom-left-radius: 4px;
+}
+
+.sender-name {
+    font-size: 0.7rem; 
+    font-weight: 600;
+    margin-bottom: 4px; 
+    color: var(--primary-dark);
+}
+
+.timestamp-text {
+    margin-top: 4px;
+    font-size: 0.65rem; 
+    opacity: 0.8;
+    text-align: right;
+    align-self: flex-end; 
+}

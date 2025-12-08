@@ -1,0 +1,139 @@
+/* PAGE */
+.admin-list-page-container {
+    min-height: 100vh;
+    background: #f5f7fa;
+    padding-top: calc(var(--header-height) + 2rem);
+}
+
+.admin-list-main-content {
+    max-width: 1200px;
+    margin: auto;
+    padding: 1rem;
+}
+
+/* CARD */
+.admin-list-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    border-bottom: 2px solid #d0d7e1;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* SEARCH */
+.admin-search-input {
+    width: 300px;
+    padding: 10px 12px;
+    border: 1px solid #d0d7e1;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+/* TABLE */
+.admin-seeker-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.admin-seeker-table thead {
+    background: #eaf0f7;
+}
+
+.admin-seeker-table th {
+    padding: 12px;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.admin-seeker-table td {
+    padding: 12px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.name-cell {
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.email-cell {
+    color: #065f46;
+    font-weight: 500;
+}
+
+.admin-seeker-table tr:hover {
+    background-color: #f3f4f6;
+}
+
+/* DELETE BUTTON */
+.btn-delete {
+    padding: 6px 14px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+.btn-delete:hover {
+    background: #dc2626;
+}
+
+/* ----------- MODAL ----------- */
+.delete-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-modal {
+    background: white;
+    padding: 2rem;
+    width: 350px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.delete-modal h2 {
+    color: #dc2626;
+    margin-bottom: 0.5rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    background: #6b7280;
+    color: white;
+    border-radius: 6px;
+    border: none;
+}
+.btn-confirm {
+    padding: 8px 16px;
+    background: #dc2626;
+    color: white;
+    border-radius: 6px;
+    border: none;
+}

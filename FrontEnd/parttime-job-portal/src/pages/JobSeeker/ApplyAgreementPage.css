@@ -1,0 +1,135 @@
+/* src/pages/JobSeeker/ApplyAgreementPage.css */
+
+/* ----------------------------------
+ * 1. Layout & Positioning
+ * ---------------------------------- */
+
+.agreement-page-container {
+  /* Replaces: max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8 */
+  padding-top: calc(var(--header-height, 4rem) + 2rem); /* Use fallback for --header-height */
+  padding-bottom: 2.5rem;
+  max-width: 48rem; /* max-w-3xl approximation */
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* ----------------------------------
+ * 2. Summary Card
+ * ---------------------------------- */
+
+.summary-card {
+  /* Replaces: bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500 mb-8 */
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-md); /* Using framework variable */
+  box-shadow: var(--shadow-md); /* Using framework variable */
+  border-left: 4px solid var(--primary); 
+  margin-bottom: 2rem;
+}
+
+.flex-summary-details {
+  /* Replaces: flex justify-between text-sm text-gray-600 */
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--text-gray); 
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.flex-summary-details span:last-child {
+  /* Using framework success color or hardcoded green */
+  color: var(--btn-success, #10b981); 
+  font-weight: 600;
+}
+
+
+/* ----------------------------------
+ * 3. Terms Card
+ * ---------------------------------- */
+
+.terms-card {
+  /* Replaces: bg-white rounded-xl shadow-2xl p-8 */
+  background-color: white;
+  border-radius: var(--radius-lg); /* Using framework variable */
+  box-shadow: var(--shadow-lg); 
+  padding: 2rem;
+}
+
+.terms-card h2 {
+  /* Replaces: text-2xl font-bold text-center text-gray-900 mb-6 */
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: var(--text-dark); 
+  margin-bottom: 1.5rem;
+}
+
+.terms-scroll-area {
+  /* Replaces: h-64 overflow-y-auto border border-gray-200 p-4 rounded-lg bg-gray-50 mb-6 */
+  height: 16rem;
+  overflow-y: auto;
+  border: 1px solid var(--secondary); 
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  background-color: var(--primary-light); 
+  margin-bottom: 1.5rem;
+}
+
+.terms-list {
+  /* Replaces: list-disc list-inside space-y-3 text-sm text-gray-700 */
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-gray); 
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* space-y-3 */
+}
+
+/* ----------------------------------
+ * 4. Checkbox & Button
+ * ---------------------------------- */
+
+.agreement-checkbox-wrapper {
+  /* Replaces: flex items-start mb-6 */
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.agreement-checkbox {
+  /* Replaces: h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mt-0.5 */
+  margin-top: 4px; /* Align check box properly */
+  height: 1.25rem;
+  width: 1.25rem;
+  border: 1px solid var(--secondary); 
+  color: var(--primary); 
+  border-radius: 0.25rem;
+  flex-shrink: 0;
+}
+
+.agreement-label {
+  /* Replaces: ml-3 text-base font-medium text-gray-800 */
+  margin-left: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-dark); 
+}
+
+/* Fix for Apply Page Button */
+.apply-btn {
+  font-size: 1.2rem;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md); /* Use framework shadow variable */
+}
+
+/* Disabled button state */
+.btn-disabled {
+  background: #a1a1aa !important; 
+  color:white !important;
+  cursor: not-allowed;
+  opacity: 0.85;
+}

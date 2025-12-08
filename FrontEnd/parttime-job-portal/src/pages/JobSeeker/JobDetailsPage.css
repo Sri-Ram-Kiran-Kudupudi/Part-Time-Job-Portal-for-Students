@@ -1,0 +1,140 @@
+/* src/pages/JobSeeker/JobDetailsPage.css */
+
+/* ----------------------------------
+ * 1. Layout & Positioning
+ * ---------------------------------- */
+
+.app-background {
+  background-color: var(--background);
+}
+
+.job-details-container {
+  /* Adjusted for general spacing and max-width */
+  padding-top: 3rem; 
+  padding-bottom: 3rem;
+  max-width: 50rem; /* max-w-lg equivalent for detail page */
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* ----------------------------------
+ * 2. Back Button Style
+ * ---------------------------------- */
+
+.btn-back-link {
+  display: inline-block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+  transition: color 150ms ease;
+  padding: 0;
+}
+
+.btn-back-link:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* ----------------------------------
+ * 3. Card and Sections
+ * ---------------------------------- */
+
+.details-card {
+  /* Overrides default 'card' padding if necessary, but using 'card' class for base styles */
+  padding: 2rem;
+  /* Use framework styles for shadow and background */
+}
+
+.job-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(0, 115, 255, 0.12);
+  color: #0056b3;
+  border-radius: 20px;
+}
+
+
+
+.job-details-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  border-bottom: 1px solid var(--secondary); /* Using secondary for divider */
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem; 
+}
+
+.description-section {
+  margin-top: 1.5rem;
+}
+
+.section-subtitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.75rem;
+}
+
+.description-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-gray);
+}
+
+/* ----------------------------------
+ * 4. Detail Items Grid
+ * ---------------------------------- */
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--secondary);
+}
+
+@media (min-width: 768px) {
+  .details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.detail-icon {
+  color: var(--primary);
+  font-size: 1.5rem; /* Slightly larger icon */
+  flex-shrink: 0;
+}
+
+.detail-label {
+  font-size: 0.875rem; /* text-sm */
+  color: var(--text-light);
+  margin-bottom: 0;
+}
+
+.detail-value {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-top: 2px;
+}
+/* ----------------------------------
+ * 5. Buttons (Using framework utility classes w-full, mt-3, mt-4)
+ * ---------------------------------- */

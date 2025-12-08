@@ -1,0 +1,146 @@
+/* src/components/ProviderJobCard.css (UPDATED for spacing and border) */
+
+/* ----------------------------------
+ * 1. Base Card Structure (Horizontal)
+ * ---------------------------------- */
+
+.provider-job-card {
+    /* Replaces: bg-white p-4 rounded-xl shadow-md border-l-4 border-indigo-500 flex flex-col md:flex-row justify-between items-start md:items-center */
+    background-color: white;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    
+    /* 🌟 ENHANCEMENT: Added border for clear separation */
+    border: 1px solid #e5e7eb; /* Light gray border */
+    
+    /* 🌟 ENHANCEMENT: Increased bottom margin for spacing between cards */
+    margin-bottom: 1rem; 
+
+    border-left: 4px solid var(--primary-color);
+    cursor: pointer;
+    transition: box-shadow 300ms ease, transform 150ms ease; /* Added transform for hover effect */
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.provider-job-card:hover {
+    box-shadow: var(--card-shadow); /* Lifted shadow effect */
+    transform: translateY(-2px); /* Slight lift for interactivity */
+}
+
+@media (min-width: 768px) { /* md: styles */
+    .provider-job-card {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+/* ----------------------------------
+ * 2. Info and Meta Area (Left)
+ * ---------------------------------- */
+
+.card-info-area {
+    /* Replaces: flex-1 min-w-0 pr-4 */
+    flex-grow: 1;
+    min-width: 0;
+    padding-right: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .card-info-area {
+        margin-bottom: 0;
+    }
+}
+
+.job-title-h3 {
+    /* Replaces: text-lg font-bold text-gray-900 truncate */
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: var(--text-gray-900);
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.job-meta-flex {
+    /* Replaces: flex items-center text-sm text-gray-500 space-x-3 mt-0.5 */
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #6b7280;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* ----------------------------------
+ * 3. Actions and Status (Right)
+ * ---------------------------------- */
+
+.card-actions-area {
+    /* Replaces: flex flex-col items-start md:items-end space-y-2 mt-3 md:mt-0 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .card-actions-area {
+        align-items: flex-end;
+        margin-top: 0;
+    }
+}
+
+.applicant-count {
+    /* Replaces: text-sm font-semibold text-indigo-600 */
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.button-group-sm {
+    gap: 0.5rem;
+}
+
+/* Edit and Delete Buttons */
+.btn-edit-action, .btn-delete-action {
+    /* Combine common structural styles */
+    padding: 0.3rem 0.7rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    border: 1px solid transparent; 
+}
+
+.btn-edit-action {
+    background-color: #3b82f6; /* Visible Blue-500 */
+    color: white; 
+    border-color: #3b82f6;
+}
+
+.btn-edit-action:hover {
+    background-color: #2563eb; /* Darker blue on hover */
+    border-color: #2563eb;
+}
+
+.btn-delete-action {
+    background-color: #ef4444; /* Visible Red-500 */
+    color: white; 
+    border-color: #ef4444;
+}
+
+.btn-delete-action:hover {
+    background-color: #dc2626; /* Darker Red-600 */
+    border-color: #dc2626;
+}

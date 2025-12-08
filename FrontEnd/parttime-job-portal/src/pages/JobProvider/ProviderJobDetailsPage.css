@@ -1,0 +1,352 @@
+/* src/pages/ProviderJobDetailsPage.css (UPDATED) */
+
+/* ----------------------------------
+ * 1. Page Structure & Base
+ * ---------------------------------- */
+
+.provider-details-page {
+    /* Uses the global body background */
+    min-height: 100vh;
+    
+    /* 🌟 FIX: Increased padding-top to clear the fixed header. 
+       This space pushes the 'Back Button' below the header. */
+    padding-top: 5rem; 
+    
+    padding-bottom: 3rem;
+}
+
+.details-main-content {
+    /* Uses a wider max-width for the main content area */
+    max-width: var(--max-w-lg, 1200px); 
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* Back Button Style */
+.btn-back-link {
+    /* Uses global link and primary color styles */
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    padding: 0.5rem 0;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+}
+
+.btn-back-link:hover {
+    text-decoration: underline;
+}
+
+/* ----------------------------------
+ * 2. Job Details Card (Top Section)
+ * ---------------------------------- */
+
+.details-card {
+    /* Uses the global card style */
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--secondary);
+    box-shadow: var(--shadow-md);
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.job-tag {
+    display: inline-block;
+    padding: 0.3rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    
+    /* Using primary light color for tag background */
+    color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+.job-title-h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+}
+
+.job-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem 2rem;
+    color: var(--text-gray);
+    border-bottom: 1px solid var(--secondary);
+    padding-bottom: 1.5rem;
+}
+
+.job-meta-grid p strong {
+    color: var(--text-dark);
+    font-weight: 700;
+    margin-right: 0.5rem;
+}
+
+.description-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+}
+
+.section-subtitle {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.75rem;
+}
+
+/* ----------------------------------
+ * 3. Applicants Table (Bottom Section)
+ * ---------------------------------- */
+
+.applicants-card {
+    /* Uses the global card style */
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    border: 1px solid var(--secondary);
+}
+
+.applicants-header {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+}
+
+.applicant-search-input {
+  width: 100%;                 /* full width inside card */
+  max-width: 500px;            /* wider & clean look */
+  padding: 12px 14px;          /* good spacing */
+  font-size: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--secondary);
+  outline: none;
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+}
+.applicant-search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 4px rgba(37, 99, 235, 0.3);
+}
+/* Table Structure */
+.applicant-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden; /* Ensures rounded corners */
+}
+
+.table-header-theme {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.table-th {
+    padding: 1rem 1rem;
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    text-transform: uppercase;
+}
+
+/* Table Rows (Beauty & UX) */
+.applicant-table-row {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--secondary);
+}
+
+.applicant-table-row:last-child {
+    border-bottom: none;
+}
+
+.applicant-table-row:hover {
+    background-color: var(--primary-light);
+    cursor: default;
+}
+
+.table-cell {
+    padding: 1rem 1rem;
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+/* Info Avatar */
+.info-button {
+    /* Ensures the button doesn't affect padding/margin unexpectedly */
+    padding: 0;
+    background: none;
+    border: none;
+    margin-right: 0.75rem;
+}
+
+.info-avatar {
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+    background-color: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    border: 2px solid var(--primary);
+    transition: transform 150ms ease;
+}
+
+.info-button:hover .info-avatar {
+    transform: scale(1.1);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    margin-left: 0.5rem;
+}
+/* Use theme-consistent colors for badges */
+.badge-accepted { background-color: #d1fae5; color: #065f46; } /* Green */
+.badge-seeker-accepted { background-color: #ffedd5; color: #b45309; } /* Amber */
+.badge-rejected { background-color: #fee2e2; color: #dc2626; } /* Red */
+.badge-pending { background-color: var(--secondary); color: var(--text-gray); } /* Theme Gray/Blue */
+
+/* Action Buttons (Consistent Button System) */
+.action-cell .flex button {
+    /* Uses the smaller button style and color utilities */
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+/* Mapping global button utilities to specific actions */
+.btn-chat,
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+/* Add hover effects for the action buttons */
+.btn-success:hover { background: #059669; }
+.btn-danger:hover { background: #dc2626; }
+.btn-primary:hover { background: var(--primary-dark); }
+/* -------------------------
+   CARD BASED APPLICANTS UI
+------------------------- */
+
+.applicants-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.applicant-card-item {
+  background: white;
+  padding: 1.2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--secondary);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.2s ease;
+}
+
+.applicant-card-item:hover {
+  background: var(--primary-light);
+}
+
+.applicant-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.applicant-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--primary);
+}
+
+.applicant-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-dark);
+}
+
+.status-badge {
+  margin-top: 4px;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Colors */
+.seeker_accepted {
+  background: #ffedd5;
+  color: #b45309;
+}
+
+.provider_accepted {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.both_accepted {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.applicant-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Make avatar + buttons clickable (pointer cursor) */
+.applicant-avatar,
+.applicant-actions button,
+.info-button,
+.btn {
+    cursor: pointer;
+}
+
+
+

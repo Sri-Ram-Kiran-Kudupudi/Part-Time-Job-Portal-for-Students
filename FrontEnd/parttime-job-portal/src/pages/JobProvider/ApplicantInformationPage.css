@@ -1,0 +1,92 @@
+/* ApplicantInformationPage.css */
+
+.applicant-info-page-container {
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, var(--background), white);
+    padding-top: calc(var(--header-height) + 2rem);
+    padding-bottom: 2rem;
+}
+
+.applicant-info-main-content {
+    max-width: 550px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.btn-back-link {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary-dark);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+.btn-back-link:hover { color: var(--primary); }
+
+.profile-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    border: 1px solid var(--secondary);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+
+.profile-avatar-large {
+    height: 6rem;
+    width: 6rem;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 4px solid var(--secondary);
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1rem;
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+}
+
+/* DETAILS LIST */
+.profile-details-list {
+    border: 1px solid var(--secondary);
+    border-radius: var(--radius-md);
+}
+
+.detail-row-flex {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+.detail-row-flex:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-gray);
+}
+.detail-value {
+    color: var(--text-dark);
+}
+
+/* CHAT BUTTON */
+.chat-view-button {
+    width: 100%;
+    margin-top: 1.5rem;
+    padding: 0.9rem;
+    background: var(--primary);
+    color: white;
+    border-radius: var(--radius-md);
+}
+.chat-view-button:hover {
+    background: var(--primary-dark);
+}

@@ -1,0 +1,87 @@
+
+/* Dashboard should cover exactly one screen, no page scroll */
+.dashboard-container {
+  height: 100vh; /* Full screen */
+  overflow: hidden; /* Prevent scrollbar ONLY on this page */
+  background: linear-gradient(to bottom right, #E7F4FF, #FFFFFF);
+
+  padding-top: 5rem; /* Space for 4rem header + 1rem extra */
+}
+
+/* Content scrolls INTERNALLY if needed, not the whole page */
+.dashboard-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  height: calc(100vh - 5rem); /* Screen height - header area */
+  overflow-y: auto; /* Only this section scrolls if needed */
+}
+
+/* Existing design styles */
+.welcome-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 1.2rem;
+  border: 1px solid #CDE9FF;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.12);
+  text-align: center;
+}
+
+.welcome-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.welcome-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.welcome-sub {
+  font-size: 1.1rem;
+  color: #3B82F6;
+}
+
+.quick-title {
+  margin-top: 3rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-left: 4px solid #3B82F6;
+  padding-left: 0.7rem;
+}
+
+.quick-grid {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.3rem;
+}
+
+.quick-button {
+  background: white;
+  padding: 1.6rem;
+  border-radius: 1rem;
+  text-align: center;
+  border: 2px solid #C7E6FF;
+  text-decoration: none;
+  transition: 0.25s ease-in-out;
+}
+
+.quick-button:hover {
+  background: #E7F4FF;
+  transform: translateY(-5px);
+}
+
+.quick-icon {
+  font-size: 2rem;
+  color: #3B82F6;
+}
+
+.quick-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+

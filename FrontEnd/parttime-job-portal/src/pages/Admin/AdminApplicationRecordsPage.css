@@ -1,0 +1,211 @@
+/* -------------------------------------------------------
+   PAGE LAYOUT
+-------------------------------------------------------- */
+.admin-page-container {
+    background: #f5f7fb;
+    min-height: 100vh;
+    padding-top: calc(var(--header-height) + 2rem);
+}
+
+.records-main-content {
+    max-width: 1200px;
+    margin: auto;
+    padding: 1rem;
+}
+
+.btn-back-link {
+    background: none;
+    border: none;
+    font-weight: 500;
+    color: var(--primary-color);
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.records-card {
+    background: #fff;
+    padding: 1.7rem;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow-2xl);
+}
+
+.page-title {
+    font-size: 1.6rem;
+    color: var(--primary-color);
+    font-weight: bold;
+    border-bottom: 2px solid #d8e2f0;
+    padding-bottom: .4rem;
+}
+
+
+/* -------------------------------------------------------
+   SEARCH INPUT
+-------------------------------------------------------- */
+.admin-search-input {
+    padding: 10px;
+    width: 350px;
+    margin: 1rem 0;
+    border: 1px solid #cfd7e3;
+    border-radius: 8px;
+}
+
+
+/* -------------------------------------------------------
+   TABLE STYLES
+-------------------------------------------------------- */
+.records-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.records-table thead {
+    background: #e9eff7;
+}
+
+.records-table th,
+.records-table td {
+    padding: 12px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.records-table tr:hover {
+    background: #f2f5fa;
+}
+
+/* Text Colors */
+.text-blue { color: #2563eb; font-weight: 600; }
+.text-green { color: #047857; font-weight: 500; }
+.text-purple { color: #7c3aed; font-weight: 500; }
+
+/* No data text */
+.no-data-text {
+    text-align: center;
+    padding: 1rem;
+    color: #6b7280;
+}
+
+
+/* -------------------------------------------------------
+   STATUS BADGES
+-------------------------------------------------------- */
+.status-badge {
+    padding: 4px 10px;
+    font-size: .8rem;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.badge-accepted-green {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-rejected-red {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+
+/* -------------------------------------------------------
+   DOWNLOAD BUTTON
+-------------------------------------------------------- */
+.btn-download {
+    padding: 6px 12px;
+    background: #10b981;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-download:hover {
+    background: #059669;
+}
+
+
+/* -------------------------------------------------------
+   LARGE MODAL POPUP (600×600)
+-------------------------------------------------------- */
+.modal-overlay-large {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content-large {
+    width: 600px;
+    max-height: 600px;
+    background: white;
+    border-radius: 14px;
+    padding: 1.5rem;
+    overflow-y: auto;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+    animation: popup 0.25s ease-out;
+}
+
+@keyframes popup {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-close-btn {
+    float: right;
+    font-size: 1.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #444;
+}
+
+.modal-title {
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+
+/* -------------------------------------------------------
+   PREVIEW BOX INSIDE MODAL
+-------------------------------------------------------- */
+.preview-box {
+    padding: 1rem;
+    background: #f4f6f9;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.preview-section-title {
+    font-size: 1.1rem;
+    color: #0a63c4;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+
+/* -------------------------------------------------------
+   MODAL BUTTONS
+-------------------------------------------------------- */
+.modal-btn-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    padding: 8px 14px;
+    background: #d1d5db;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background: #bfc4ca;
+}

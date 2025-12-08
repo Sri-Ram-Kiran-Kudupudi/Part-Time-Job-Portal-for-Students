@@ -1,0 +1,79 @@
+/* ==================================
+   1. Layout and Page Structure
+   ================================== */
+
+.admin-dashboard-page {
+    min-height: 100vh;
+    background-color: var(--background-color);
+    padding-top: calc(var(--header-height) + 2rem);
+    padding-bottom: 3rem;
+}
+
+.admin-main-content {
+    max-width: 1200px;  /* Large container to fit 3 cards in a row */
+    margin: 0 auto;
+    padding: 3rem 1rem;
+}
+
+.main-header-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-gray-900);
+    margin-bottom: 2rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--secondary-color);
+    text-align: center;
+}
+
+/* ==================================
+   2. Cards Layout (Horizontal)
+   ================================== */
+
+.admin-card-group-spacing {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 2rem;
+}
+
+/* ==================================
+   3. Admin Cards Styling
+   ================================== */
+
+.admin-card {
+    width: 300px;              /* Equal width */
+    padding: 2rem;
+    background-color: white;
+    border-radius: 1rem;
+    text-align: center;
+    text-decoration: none;
+
+    /* Beautiful shadow */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+
+    /* Left accent border */
+    border-left: 8px solid var(--primary-color);
+
+    /* Smooth animation */
+    transition: all 250ms ease;
+}
+
+/* Hover animation */
+.admin-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+}
+
+/* Card icon */
+.admin-card-icon {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+}
+
+/* Card title */
+.admin-card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-gray-900);
+}

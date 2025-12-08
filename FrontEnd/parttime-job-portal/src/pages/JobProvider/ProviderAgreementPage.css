@@ -1,0 +1,145 @@
+/* src/pages/JobProvider/ProviderAgreementPage.css */
+
+/* ----------------------------------
+ * 1. Layout and Page Structure
+ * ---------------------------------- */
+
+.agreement-page-container {
+    min-height: 100vh;
+    background-color: var(--background-color);
+    padding-top: calc(var(--header-height) + 2rem);
+    padding-bottom: 2.5rem;
+}
+
+.agreement-main-content {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* ⬅️ BACK BUTTON STYLES */
+.btn-back-link {
+    display: inline-block;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary-color); /* Blue text */
+    transition: color 150ms ease;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.btn-back-link:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* ----------------------------------
+ * 2. Agreement Card
+ * ---------------------------------- */
+
+.agreement-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: var(--card-shadow-2xl);
+    padding: 2rem;
+}
+
+.agreement-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.agreement-sub-text {
+    text-align: center;
+    color: var(--text-gray-600);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+/* ----------------------------------
+ * 3. Terms and Checkbox
+ * ---------------------------------- */
+
+.terms-scroll-area {
+    height: 16rem;
+    overflow-y: auto;
+    border: 1px solid var(--secondary-color);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: #fcfdfe;
+    margin-bottom: 1.5rem;
+}
+
+.terms-list {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-gray-600);
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.agreement-checkbox {
+    margin-top: 4px; 
+    height: 1.25rem;
+    width: 1.25rem;
+    accent-color: var(--primary-color); 
+    flex-shrink: 0;
+}
+
+.agreement-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-gray-900);
+    margin-left: 0.5rem;
+}
+
+/* ----------------------------------
+ * 4. Button and Status
+ * ---------------------------------- */
+
+.agree-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
+    transition: all 150ms ease;
+    border: none;
+    cursor: pointer;
+}
+
+.agree-button:not(.disabled) {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.agree-button:not(.disabled):hover {
+    background-color: var(--primary-hover);
+}
+
+.agree-button.disabled {
+    background-color: #9ca3af; 
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.status-note-text {
+    font-size: 0.9rem;
+    color: #10b981; /* Green for success note */
+    font-weight: 600;
+    text-align: center;
+    margin-top: 1rem;
+}

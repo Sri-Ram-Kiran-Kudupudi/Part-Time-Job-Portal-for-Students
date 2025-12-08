@@ -1,0 +1,83 @@
+/* -----------------------------
+   1. Card Structure
+------------------------------ */
+.job-card-link {
+    display: block;
+    text-decoration: none;
+}
+
+.job-card {
+    background-color: white;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--primary-color);
+    transition: box-shadow 300ms ease;
+}
+
+.job-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* -----------------------------
+   2. Title
+------------------------------ */
+.job-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: rgb(8, 179, 247);
+    margin-bottom: 0.5rem;
+}
+
+/* -----------------------------
+   3. Meta Information
+------------------------------ */
+.job-location {
+    color: rgb(8, 179, 247);
+    font-size: 0.9rem;
+}
+
+.job-meta-row {
+    margin-bottom: 0.75rem;
+}
+
+/* -----------------------------
+   4. Salary + Timing Row
+------------------------------ */
+.job-details-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e5e7eb;
+}
+
+.job-salary {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #10b981;
+}
+
+.job-timing {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+/* -----------------------------
+   5. Job Type Tag (Moved here)
+------------------------------ */
+.job-type-row {
+    margin-top: 0.75rem;
+    text-align: left;
+}
+
+.job-type-tag {
+    padding: 4px 10px;
+    background-color: #eef6ff;
+    color: #0077cc;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    display: inline-block;
+    font-weight: 500;
+}
