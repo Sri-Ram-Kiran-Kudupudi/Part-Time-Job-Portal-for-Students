@@ -2,31 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import "./SeekerAppliedJobsPage.css";
-import { getAppliedJobs, deleteApplication } from "../../service/api";
+import {
+  getAppliedJobs,
+  deleteApplication,
+  seekerHideApplication,
+} from "../../service/api";
 import { toast } from "react-toastify";
 
-const AppliedJobCard = ({ job, onDelete }) => {
+const AppliedJobCard = ({ job, onDelete, onHide }) => {
   const navigate = useNavigate();
 
-  const getStatusInfo = (status) => {
-    const s = status?.toLowerCase().replace(/\s+/g, "_");
-
-    if (s === "both_accepted")
-      return { text: "Accepted", className: "status-accepted", canDelete: false };
-
-    if (s === "seeker_accepted" || s === "provider_accepted")
-      return { text: "Waiting for Provider", className: "status-waiting", canDelete: true };
-
-    if (s === "rejected")
-      return { text: "Rejected", className: "status-rejected", canDelete: false };
-
-    return { text: "Pending", className: "status-pending", canDelete: true };
-  };
-
-  const info = getStatusInfo(job.status);
-
   const normalizedStatus = job.status?.toLowerCase().replace(/\s+/g, "_");
-  const showChatButton = normalizedStatus === "both_accepted" && job.chatId != null;
+  const isBothAccepted = normalizedStatus === "both_accepted";
 
   return (
     <div className="applied-job-card">
@@ -38,21 +25,32 @@ const AppliedJobCard = ({ job, onDelete }) => {
       </div>
 
       <div className="status-box">
-        <span className={`status-badge ${info.className}`}>{info.text}</span>
+        <span className={`status-badge ${normalizedStatus}`}>
+          {job.status.replace("_", " ")}
+        </span>
 
-        {showChatButton ? (
+        {/* ⭐ CHAT BUTTON */}
+        {isBothAccepted && job.chatId ? (
           <button
-            onClick={() => navigate(`/chat/${job.chatId}`)}
             className="btn btn-primary"
+            onClick={() => navigate(`/chat/${job.chatId}`)}
           >
             Chat
           </button>
-        ) : (
-          info.canDelete && (
-            <button className="btn btn-danger" onClick={() => onDelete(job)}>
-              Delete
-            </button>
-          )
+        ) : null}
+
+        {/* ⭐ DELETE BEFORE ACCEPTANCE */}
+        {!isBothAccepted && normalizedStatus !== "rejected" && (
+          <button className="btn btn-danger" onClick={() => onDelete(job)}>
+            Delete
+          </button>
+        )}
+
+        {/* ⭐ REMOVE AFTER BOTH ACCEPT */}
+        {isBothAccepted && (
+          <button className="btn btn-danger" onClick={() => onHide(job)}>
+            Remove
+          </button>
         )}
       </div>
     </div>
@@ -64,9 +62,12 @@ const SeekerAppliedJobsPage = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal state
+  // Delete Modal
   const [showModal, setShowModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
+
+  // Hide Modal
+  const [showHideModal, setShowHideModal] = useState(false);
 
   const loadJobs = async () => {
     try {
@@ -89,9 +90,12 @@ const SeekerAppliedJobsPage = () => {
     setShowModal(true);
   };
 
-  const confirmDelete = async () => {
-    if (!selectedJob) return;
+  const askHide = (job) => {
+    setSelectedJob(job);
+    setShowHideModal(true);
+  };
 
+  const confirmDelete = async () => {
     try {
       await deleteApplication(selectedJob.applicationId);
       toast.success("Application withdrawn");
@@ -99,8 +103,19 @@ const SeekerAppliedJobsPage = () => {
     } catch (err) {
       toast.error("Could not delete application");
     }
-
     setShowModal(false);
+    setSelectedJob(null);
+  };
+
+  const confirmHide = async () => {
+    try {
+      await seekerHideApplication(selectedJob.applicationId);
+      toast.success("Removed from your list");
+      loadJobs();
+    } catch (err) {
+      toast.error("Failed to remove application");
+    }
+    setShowHideModal(false);
     setSelectedJob(null);
   };
 
@@ -125,6 +140,7 @@ const SeekerAppliedJobsPage = () => {
               key={job.applicationId}
               job={job}
               onDelete={askDelete}
+              onHide={askHide}
             />
           ))}
         </div>
@@ -134,19 +150,43 @@ const SeekerAppliedJobsPage = () => {
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h3>Confirm Delete</h3>
+            <h3>Withdraw Application</h3>
             <p>
-              Are you sure you want to withdraw your application for{" "}
-              <b>{selectedJob?.title}</b>?
+              Remove your application for <b>{selectedJob?.title}</b>?
             </p>
 
             <div className="modal-buttons">
               <button className="btn btn-danger" onClick={confirmDelete}>
-                Yes, Delete
+                Yes, Withdraw
               </button>
               <button
                 className="btn btn-secondary"
                 onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HIDE AFTER BOTH ACCEPTED */}
+      {showHideModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Remove From List</h3>
+            <p>
+              Do you want to remove <b>{selectedJob?.title}</b> from your
+              completed jobs?
+            </p>
+
+            <div className="modal-buttons">
+              <button className="btn btn-danger" onClick={confirmHide}>
+                Yes, Remove
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowHideModal(false)}
               >
                 Cancel
               </button>

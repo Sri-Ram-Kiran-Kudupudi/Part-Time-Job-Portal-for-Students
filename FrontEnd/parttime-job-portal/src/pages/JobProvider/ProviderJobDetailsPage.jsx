@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import {
   getProviderJobById,
   providerReject,
+  providerHideApplication,  // ⭐ NEW IMPORT
 } from "../../service/api";
 
 const ProviderJobDetailsPage = () => {
@@ -41,6 +42,17 @@ const ProviderJobDetailsPage = () => {
       fetchJob();
     } catch (err) {
       toast.error("Failed to reject applicant");
+    }
+  };
+
+  // ⭐ NEW: Provider Hide (Soft Remove)
+  const handleProviderHide = async (applicationId) => {
+    try {
+      await providerHideApplication(applicationId);
+      toast.success("Applicant removed from list");
+      fetchJob();
+    } catch (err) {
+      toast.error("Failed to remove applicant");
     }
   };
 
@@ -119,7 +131,7 @@ const ProviderJobDetailsPage = () => {
                 <div className="applicant-left">
                   <div
                     className="applicant-avatar"
-                    onClick={() => navigate(`/applicant/info/${applicant.userId}`)} // ⭐ FIXED
+                    onClick={() => navigate(`/applicant/info/${applicant.userId}`)}
                   >
                     {applicant.name.charAt(0)}
                   </div>
@@ -150,6 +162,17 @@ const ProviderJobDetailsPage = () => {
 
                 {/* ACTION BUTTONS */}
                 <div className="applicant-actions">
+                  
+                  {/* ⭐ NEW — REMOVE BUTTON for provider */}
+                  {applicant.status === "both_accepted" && (
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleProviderHide(applicant.applicationId)}
+                    >
+                      Remove
+                    </button>
+                  )}
+
                   {applicant.status === "both_accepted" ? (
                     <button
                       onClick={() => navigate(`/chat/${applicant.chatId}`)}
@@ -162,7 +185,7 @@ const ProviderJobDetailsPage = () => {
                       <button
                         onClick={() =>
                           navigate(
-                            `/provider/agreement/${jobDetails.id}/${applicant.userId}/${applicant.applicationId}` // ⭐ FIXED
+                            `/provider/agreement/${jobDetails.id}/${applicant.userId}/${applicant.applicationId}`
                           )
                         }
                         className="btn btn-primary"

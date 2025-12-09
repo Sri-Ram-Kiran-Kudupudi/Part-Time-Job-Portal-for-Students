@@ -43,6 +43,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // PUBLIC ROUTES
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/register",
@@ -51,26 +52,38 @@ public class SecurityConfig {
                                 "/ws/**"
                         ).permitAll()
 
-                        .requestMatchers("/api/jobs", "/api/jobs/*").permitAll()
+                        // PUBLIC — Only job listing
+                        .requestMatchers("/api/jobs", "/api/jobs/all").permitAll()
 
+                        // SEEKER ONLY
+                        .requestMatchers("/api/jobs/applied").hasRole("SEEKER")
                         .requestMatchers("/api/jobs/*/apply").hasRole("SEEKER")
+                        .requestMatchers("/api/jobs/applications/*/hide/seeker").hasRole("SEEKER")
 
+                        // PROVIDER ONLY
                         .requestMatchers("/api/jobs/applications/*/accept").hasRole("PROVIDER")
                         .requestMatchers("/api/jobs/applications/*/reject").hasRole("PROVIDER")
+                        .requestMatchers("/api/jobs/applications/*/hide/provider").hasRole("PROVIDER")
 
+                        // CHAT
                         .requestMatchers("/api/chat/**").hasAnyRole("SEEKER", "PROVIDER")
 
+                        // SEEKER MODULE
                         .requestMatchers("/api/seeker/**").hasRole("SEEKER")
 
+                        // PROVIDER MODULE
                         .requestMatchers("/api/provider/**").hasRole("PROVIDER")
 
+                        // ADMIN MODULE
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // ⭐ IMPORTANT FIX
-                        .requestMatchers("/api/applicant/**").hasAnyRole("SEEKER", "PROVIDER", "ADMIN")
+                        // Applicant profile access
+                        .requestMatchers("/api/applicant/**")
+                        .hasAnyRole("SEEKER", "PROVIDER", "ADMIN")
 
                         .anyRequest().authenticated()
                 )
+
 
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtEntryPoint))
 

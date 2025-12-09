@@ -1,14 +1,14 @@
-
-import React, { useState, useEffect } from 'react';
-import Header from '../../components/Header';
-import ProviderJobCard from './ProviderJobCard';
-import './ProviderDashboardPage.css';
+import React, { useState, useEffect } from "react";
+import Header from "../../components/Header";
+import ProviderJobCard from "./ProviderJobCard";
+import "./ProviderDashboardPage.css";
 import { toast } from "react-toastify";
+import LeafletMapPicker from "./components/LeafletMapPicker";
 
 import {
     createJob,
     getProviderJobs,
-    updateProviderJob, 
+    updateProviderJob,
     deleteProviderJob,
 } from "../../service/api";
 
@@ -25,6 +25,7 @@ const jobTypes = [
     "Urgent / Today Only Job",
 ];
 
+// --- REUSABLE INPUT FIELD ---
 const InputField = ({ label, name, type = "text", value, onChange }) => (
     <div className="form-group mb-4">
         <label htmlFor={name} className="form-label">{label}</label>
@@ -60,16 +61,39 @@ const SelectField = ({ label, name, value, options, onChange }) => (
     </div>
 );
 
-// --- EDIT JOB MODAL ---
+// ===================================================================================
+// EDIT JOB MODAL (WITH MAP PICKER)
+// ===================================================================================
 const EditJobModal = ({ job, onUpdate, onClose }) => {
     const [jobData, setJobData] = useState({
-        name: job.title || '', type: job.type || jobTypes[0], timing: job.timing || '',
-        salary: job.salary || '', description: job.description || '', city: job.city || '',
-        district: job.district || '', state: job.state || '',
+        name: job.title || "",
+        type: job.type || jobTypes[0],
+        timing: job.timing || "",
+        salary: job.salary || "",
+        description: job.description || "",
+        city: job.city || "",
+        district: job.district || "",
+        state: job.state || "",
+        latitude: job.latitude || 16.5449,
+        longitude: job.longitude || 81.5212,
     });
 
     const handleChange = (e) => {
         setJobData({ ...jobData, [e.target.name]: e.target.value });
+    };
+
+    // Handler receives richer loc object from picker
+    const handleLocationSelect = (loc) => {
+        // loc: { lat, lng, address, city, district, state }
+        setJobData((prev) => ({
+            ...prev,
+            latitude: loc.lat,
+            longitude: loc.lng,
+            // Option A: auto-fill (still editable)
+            city: loc.city || prev.city,
+            district: loc.district || prev.district,
+            state: loc.state || prev.state,
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -84,6 +108,8 @@ const EditJobModal = ({ job, onUpdate, onClose }) => {
             city: jobData.city,
             district: jobData.district,
             state: jobData.state,
+            latitude: jobData.latitude,
+            longitude: jobData.longitude,
         };
 
         try {
@@ -110,10 +136,28 @@ const EditJobModal = ({ job, onUpdate, onClose }) => {
                     <InputField label="City" name="city" value={jobData.city} onChange={handleChange} />
                     <InputField label="District" name="district" value={jobData.district} onChange={handleChange} />
                     <SelectField label="State" name="state" value={jobData.state} options={STATES} onChange={handleChange} />
+
                     <div className="form-group mb-4">
                         <label className="form-label">Description</label>
-                        <textarea name="description" value={jobData.description} onChange={handleChange} rows="3" className="form-control-base"></textarea>
+                        <textarea
+                            name="description"
+                            value={jobData.description}
+                            onChange={handleChange}
+                            rows="3"
+                            className="form-control-base"
+                        ></textarea>
                     </div>
+
+                    {/* 📍 MAP PICKER */}
+                    <label className="form-label">Update Job Location (Drag Pin)</label>
+                    <LeafletMapPicker
+                        defaultPosition={{
+                            lat: jobData.latitude,
+                            lng: jobData.longitude,
+                        }}
+                        onLocationSelect={handleLocationSelect}
+                    />
+
                     <button type="submit" className="btn-primary form-submit-btn mt-4">Apply Changes 📝</button>
                 </form>
             </div>
@@ -121,18 +165,46 @@ const EditJobModal = ({ job, onUpdate, onClose }) => {
     );
 };
 
-// --- POST JOB FORM ---
+// ===================================================================================
+// POST JOB FORM (WITH MAP PICKER)
+// ===================================================================================
 const PostJobForm = ({ onJobSubmit }) => {
     const [jobData, setJobData] = useState({
-        name: "", type: jobTypes[0], timing: "", salary: "", description: "", city: "", district: "", state: "",
+        name: "",
+        type: jobTypes[0],
+        timing: "",
+        salary: "",
+        description: "",
+        city: "",
+        district: "",
+        state: "",
+        latitude: null,
+        longitude: null,
     });
 
     const handleChange = (e) => {
         setJobData({ ...jobData, [e.target.name]: e.target.value });
     };
 
+    // Handler receives richer loc object from picker
+    const handleLocationSelect = (loc) => {
+        // Option A: auto-fill but editable
+        setJobData((prev) => ({
+            ...prev,
+            latitude: loc.lat,
+            longitude: loc.lng,
+            city: loc.city || prev.city,
+            district: loc.district || prev.district,
+            state: loc.state || prev.state,
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!jobData.latitude || !jobData.longitude) {
+            return toast.error("📍 Please select job location on map!");
+        }
 
         const payload = {
             title: jobData.name,
@@ -143,6 +215,8 @@ const PostJobForm = ({ onJobSubmit }) => {
             city: jobData.city,
             district: jobData.district,
             state: jobData.state,
+            latitude: jobData.latitude,
+            longitude: jobData.longitude,
         };
 
         try {
@@ -154,14 +228,23 @@ const PostJobForm = ({ onJobSubmit }) => {
         }
 
         setJobData({
-            name: "", type: jobTypes[0], timing: "", salary: "",
-            description: "", city: "", district: "", state: "",
+            name: "",
+            type: jobTypes[0],
+            timing: "",
+            salary: "",
+            description: "",
+            city: "",
+            district: "",
+            state: "",
+            latitude: null,
+            longitude: null,
         });
     };
 
     return (
         <div className="dashboard-card job-list-wrapper form-sticky">
             <h2 className="form-title border-b pb-2">Post a New Job</h2>
+
             <form onSubmit={handleSubmit} className="form-spacing">
                 <InputField label="Job Name" name="name" value={jobData.name} onChange={handleChange} />
                 <SelectField label="Job Type" name="type" value={jobData.type} options={jobTypes} onChange={handleChange} />
@@ -170,26 +253,38 @@ const PostJobForm = ({ onJobSubmit }) => {
                 <InputField label="City" name="city" value={jobData.city} onChange={handleChange} />
                 <InputField label="District" name="district" value={jobData.district} onChange={handleChange} />
                 <SelectField label="State" name="state" value={jobData.state} options={STATES} onChange={handleChange} />
+
                 <div className="form-group mb-4">
                     <label className="form-label">Description</label>
-                    <textarea name="description" value={jobData.description} onChange={handleChange} rows="3" className="form-control-base"></textarea>
+                    <textarea
+                        name="description"
+                        value={jobData.description}
+                        onChange={handleChange}
+                        rows="3"
+                        className="form-control-base"
+                    ></textarea>
                 </div>
-                <button type="submit" className="btn-primary form-submit-btn">Submit Job Post</button>
+
+                {/* 📍 MAP PICKER */}
+                <label className="form-label">Select Job Location (Drag Pin)</label>
+                <LeafletMapPicker
+                    onLocationSelect={handleLocationSelect}
+                />
+
+                <button type="submit" className="btn-primary form-submit-btn mt-3">Submit Job Post</button>
             </form>
         </div>
     );
 };
 
-// ================================================================
-// MAIN PROVIDER DASHBOARD PAGE WITH DELETE MODAL + TOASTS
-// ================================================================
-
+// ===================================================================================
+// MAIN PAGE
+// ===================================================================================
 const ProviderDashboardPage = () => {
     const [jobs, setJobs] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [jobToEdit, setJobToEdit] = useState(null);
 
-    // DELETE MODAL
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
 
@@ -200,12 +295,12 @@ const ProviderDashboardPage = () => {
     }, []);
 
     const handleJobSubmit = (job) => {
-        setJobs(prev => [job, ...prev]);
+        setJobs((prev) => [job, ...prev]);
     };
 
     const handleJobUpdate = (jobId, updatedJobData) => {
-        setJobs(prev =>
-            prev.map(job =>
+        setJobs((prev) =>
+            prev.map((job) =>
                 job.id === jobId ? { ...job, ...updatedJobData } : job
             )
         );
@@ -221,19 +316,17 @@ const ProviderDashboardPage = () => {
         setJobToEdit(null);
     };
 
-    // OPEN DELETE MODAL
     const askDelete = (job) => {
         setSelectedJob(job);
         setShowDeleteModal(true);
     };
 
-    // CONFIRM DELETE
     const confirmDelete = async () => {
         if (!selectedJob) return;
 
         try {
             await deleteProviderJob(selectedJob.id);
-            setJobs(prev => prev.filter(j => j.id !== selectedJob.id));
+            setJobs((prev) => prev.filter((j) => j.id !== selectedJob.id));
             toast.success("Job deleted successfully!");
         } catch (err) {
             toast.error("Failed to delete job");
@@ -278,7 +371,6 @@ const ProviderDashboardPage = () => {
                 </div>
             </main>
 
-            {/* EDIT MODAL */}
             {isModalOpen && jobToEdit && (
                 <EditJobModal
                     job={jobToEdit}
@@ -287,7 +379,6 @@ const ProviderDashboardPage = () => {
                 />
             )}
 
-            {/* DELETE CONFIRMATION MODAL */}
             {showDeleteModal && (
                 <div className="modal-overlay">
                     <div className="modal-box">
@@ -312,7 +403,6 @@ const ProviderDashboardPage = () => {
                     </div>
                 </div>
             )}
-
         </div>
     );
 };

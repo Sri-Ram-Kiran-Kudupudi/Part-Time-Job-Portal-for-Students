@@ -27,10 +27,6 @@ public class JobServiceImpl implements JobService {
     private final JobApplicationRepository applicationRepository;
 
     private JobResponse toDto(Job job) {
-        String createdAtStr = null;
-        if (job.getCreatedAt() != null) {
-            createdAtStr = job.getCreatedAt().toString();
-        }
         return JobResponse.builder()
                 .id(job.getId())
                 .title(job.getTitle())
@@ -41,12 +37,11 @@ public class JobServiceImpl implements JobService {
                 .city(job.getCity())
                 .district(job.getDistrict())
                 .state(job.getState())
-                .latitude(job.getLatitude())     // ⭐ NEW
-                .longitude(job.getLongitude())   // ⭐ NEW
+                .latitude(job.getLatitude())
+                .longitude(job.getLongitude())
                 .providerId(job.getProviderId())
-                .createdAt(createdAtStr)
+                .createdAt(job.getCreatedAt() != null ? job.getCreatedAt().toString() : null)
                 .build();
-
     }
 
     @Override
@@ -61,11 +56,10 @@ public class JobServiceImpl implements JobService {
                 .city(req.getCity())
                 .district(req.getDistrict())
                 .state(req.getState())
-                .latitude(req.getLatitude())    // ⭐ NEW
-                .longitude(req.getLongitude())  // ⭐ NEW
+                .latitude(req.getLatitude())
+                .longitude(req.getLongitude())
                 .providerId(providerId)
                 .build();
-
 
         return toDto(jobRepository.save(job));
     }
@@ -104,7 +98,6 @@ public class JobServiceImpl implements JobService {
         job.setLatitude(req.getLatitude());
         job.setLongitude(req.getLongitude());
 
-
         return toDto(jobRepository.save(job));
     }
 
@@ -122,39 +115,37 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobResponse> getAllJobs(String search, String city, String type, String salary) {
-        List<Job> jobs = jobRepository.filterJobs(
-                search == null ? null : search.trim().toLowerCase(),
-                city == null ? null : city.trim().toLowerCase(),
-                type == null ? null : type.trim().toLowerCase(),
-                salary
-        );
-
-        return jobs.stream().map(this::toDto).collect(Collectors.toList());
+        return jobRepository.filterJobs(
+                        search == null ? null : search.trim().toLowerCase(),
+                        city == null ? null : city.trim().toLowerCase(),
+                        type == null ? null : type.trim().toLowerCase(),
+                        salary
+                )
+                .stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    // ⭐⭐⭐ UPDATED: PROVIDER NOW RECEIVES chatId
+    // ⭐ PROVIDER SEES ONLY APPLICATIONS NOT HIDDEN FROM PROVIDER
     @Override
     public ProviderJobResponse getJobWithApplicants(Long jobId) {
 
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
-        List<JobApplication> apps = applicationRepository.findByJob(job);
+        List<JobApplication> apps =
+                applicationRepository.findByJobAndHiddenFromProviderFalse(job);
 
         List<ProviderApplicantDTO> applicantDTOs = apps.stream().map(app -> {
-            Applicant ap = app.getApplicant();
 
-            Long chatId = null;
-            if (app.getChatRoom() != null) {
-                chatId = app.getChatRoom().getId();
-            }
+            Long chatId = app.getChatRoom() != null
+                    ? app.getChatRoom().getId()
+                    : null;
 
             return ProviderApplicantDTO.builder()
                     .applicationId(app.getId())
-                    .applicantId(ap.getId())              // applicant table ID
-                    .userId(ap.getUser().getId())         // ⭐ NEW — user table ID
-                    .name(ap.getUser().getFullName())
-                    .age(ap.getAge())
+                    .applicantId(app.getApplicant().getId())
+                    .userId(app.getApplicant().getUser().getId())
+                    .name(app.getApplicant().getUser().getFullName())
+                    .age(app.getApplicant().getAge())
                     .status(app.getStatus())
                     .chatId(chatId)
                     .build();
@@ -173,5 +164,4 @@ public class JobServiceImpl implements JobService {
                 .applicants(applicantDTOs)
                 .build();
     }
-
 }

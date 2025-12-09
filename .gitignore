@@ -1,0 +1,20 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React build
+build/
+dist/
+
+# Environment
+.env
+
+# IDE files
+.vscode/
+.idea/
+
+# Spring Boot
+target/
+*.jar
+*.war

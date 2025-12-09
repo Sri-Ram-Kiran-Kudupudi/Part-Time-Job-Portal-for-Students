@@ -11,6 +11,7 @@ import com.Sriram.Part_Time_jobProtal.Exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,9 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
 
+    // -----------------------------------------------------------
+    // APPLY FOR A JOB
+    // -----------------------------------------------------------
     @Override
     public ApplicationResponse applyForJob(Long jobId, Long userId, ApplyJobRequest request) {
 
@@ -48,6 +52,8 @@ public class JobApplicationServiceImpl implements JobApplicationService {
                 .seekerMessage(request.getMessage())
                 .status("seeker_accepted")
                 .appliedAt(LocalDateTime.now())
+                .hiddenFromSeeker(false)
+                .hiddenFromProvider(false)
                 .build();
 
         JobApplication saved = applicationRepository.save(app);
@@ -56,6 +62,9 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         return ApplicationResponse.fromEntity(saved, provider);
     }
 
+    // -----------------------------------------------------------
+    // SEEKER APPLIED JOB LIST
+    // -----------------------------------------------------------
     @Override
     public List<ApplicationResponse> getApplicationsForSeeker(Long userId) {
 
@@ -65,7 +74,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         Applicant applicant = applicantRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("Applicant profile not found"));
 
-        return applicationRepository.findByApplicant(applicant)
+        return applicationRepository.findByApplicantAndHiddenFromSeekerFalse(applicant)
                 .stream()
                 .map(app -> {
                     User provider = userRepository.findById(app.getJob().getProviderId()).orElse(null);
@@ -74,13 +83,16 @@ public class JobApplicationServiceImpl implements JobApplicationService {
                 .collect(Collectors.toList());
     }
 
+    // -----------------------------------------------------------
+    // PROVIDER VIEW APPLICANTS OF A JOB
+    // -----------------------------------------------------------
     @Override
     public List<ApplicationResponse> getApplicationsForJob(Long jobId) {
 
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
-        return applicationRepository.findByJob(job)
+        return applicationRepository.findByJobAndHiddenFromProviderFalse(job)
                 .stream()
                 .map(app -> {
                     User provider = userRepository.findById(job.getProviderId()).orElse(null);
@@ -89,36 +101,28 @@ public class JobApplicationServiceImpl implements JobApplicationService {
                 .collect(Collectors.toList());
     }
 
-    // ⭐⭐⭐ FIXED STATUS FLOW: PROVIDER ACCEPT ⭐⭐⭐
+    // -----------------------------------------------------------
+    // PROVIDER ACCEPT
+    // -----------------------------------------------------------
     @Override
     public ApplicationResponse providerAccept(Long applicationId) {
 
         JobApplication app = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
-        String current = app.getStatus();
+        String status = app.getStatus();
 
-        if (current.equals("seeker_accepted")) {
-
-            // ⭐ NOW FINAL MATCH
+        if ("seeker_accepted".equalsIgnoreCase(status)) {
             app.setStatus("both_accepted");
 
-            // Create chat room ONLY once
+            // Create chat room only once
             if (app.getChatRoom() == null) {
                 ChatRoom room = chatRoomRepository.save(
-                        ChatRoom.builder()
-                                .createdAt(LocalDateTime.now())
-                                .build()
+                        ChatRoom.builder().createdAt(LocalDateTime.now()).build()
                 );
                 app.setChatRoom(room);
             }
-
-        } else if (current.equals("provider_accepted")) {
-            // already accepted by provider → no change
-            app.setStatus("provider_accepted");
-
         } else {
-            // Seeker has NOT accepted yet
             app.setStatus("provider_accepted");
         }
 
@@ -128,6 +132,9 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         return ApplicationResponse.fromEntity(saved, provider);
     }
 
+    // -----------------------------------------------------------
+    // PROVIDER REJECT
+    // -----------------------------------------------------------
     @Override
     public ApplicationResponse providerReject(Long applicationId) {
 
@@ -138,10 +145,12 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         JobApplication saved = applicationRepository.save(app);
 
         User provider = userRepository.findById(app.getJob().getProviderId()).orElse(null);
-
         return ApplicationResponse.fromEntity(saved, provider);
     }
 
+    // -----------------------------------------------------------
+    // SEEKER APPLIED JOB LIST (CARD VIEW)
+    // -----------------------------------------------------------
     @Override
     public List<AppliedJobDTO> getAppliedJobsForSeeker(Long userId) {
 
@@ -151,15 +160,13 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         Applicant applicant = applicantRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("Applicant profile not found"));
 
-        return applicationRepository.findByApplicant(applicant)
+        return applicationRepository.findByApplicantAndHiddenFromSeekerFalse(applicant)
                 .stream()
                 .map(app -> {
 
                     User provider = userRepository.findById(app.getJob().getProviderId()).orElse(null);
 
-                    Long chatId = (app.getChatRoom() != null)
-                            ? app.getChatRoom().getId()
-                            : null;
+                    Long chatId = app.getChatRoom() != null ? app.getChatRoom().getId() : null;
 
                     return AppliedJobDTO.builder()
                             .applicationId(app.getId())
@@ -176,6 +183,9 @@ public class JobApplicationServiceImpl implements JobApplicationService {
                 .collect(Collectors.toList());
     }
 
+    // -----------------------------------------------------------
+    // WITHDRAW (only if not accepted)
+    // -----------------------------------------------------------
     @Override
     public void withdrawApplication(Long applicationId, Long seekerId) {
 
@@ -186,12 +196,79 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             throw new RuntimeException("Unauthorized delete attempt");
         }
 
-        String status = app.getStatus().toLowerCase();
-
-        if (status.equals("both_accepted") || status.equals("rejected")) {
+        if (app.getStatus().equalsIgnoreCase("both_accepted")
+                || app.getStatus().equalsIgnoreCase("rejected")) {
             throw new RuntimeException("Cannot withdraw after acceptance or rejection");
         }
 
         applicationRepository.delete(app);
+    }
+
+    // -----------------------------------------------------------
+    // SEEKER HIDE
+    // -----------------------------------------------------------
+    @Override
+    @Transactional
+    public void hideApplicationForSeeker(Long applicationId, Long seekerUserId) {
+
+        JobApplication app = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+
+        if (!app.getApplicant().getUser().getId().equals(seekerUserId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        // ⭐ IMPORTANT FIX: Only allow hide when chat room exists
+        if (app.getChatRoom() == null) {
+            throw new RuntimeException("Cannot remove — job not fully completed yet");
+        }
+
+        app.setHiddenFromSeeker(true);
+        applicationRepository.save(app);
+
+        // If provider also removed → delete everything
+        if (app.isHiddenFromProvider()) {
+            cleanupApplication(app);
+        }
+    }
+
+    // -----------------------------------------------------------
+    // PROVIDER HIDE
+    // -----------------------------------------------------------
+    @Override
+    @Transactional
+    public void hideApplicationForProvider(Long applicationId, Long providerUserId) {
+
+        JobApplication app = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
+
+        if (!app.getJob().getProviderId().equals(providerUserId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        // ⭐ IMPORTANT FIX: Only allow hide when chat room exists
+        if (app.getChatRoom() == null) {
+            throw new RuntimeException("Cannot remove — job not fully completed yet");
+        }
+
+        app.setHiddenFromProvider(true);
+        applicationRepository.save(app);
+
+        // If seeker also removed → delete everything
+        if (app.isHiddenFromSeeker()) {
+            cleanupApplication(app);
+        }
+    }
+
+    // -----------------------------------------------------------
+    // CLEANUP (DELETE application + cascade deletes chat)
+    // -----------------------------------------------------------
+    @Transactional
+    protected void cleanupApplication(JobApplication app) {
+
+        JobApplication fresh = applicationRepository.findById(app.getId()).orElse(null);
+        if (fresh == null) return;
+
+        applicationRepository.delete(fresh); // Cascade deletes chatRoom automatically
     }
 }

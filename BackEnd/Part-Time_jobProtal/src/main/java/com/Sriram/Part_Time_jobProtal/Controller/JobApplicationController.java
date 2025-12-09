@@ -60,4 +60,26 @@ public class JobApplicationController {
     public ResponseEntity<?> providerReject(@PathVariable Long applicationId) {
         return ResponseEntity.ok(applicationService.providerReject(applicationId));
     }
+
+    // ---------- NEW: seeker hides the completed application from their view ----------
+    @PutMapping("/applications/{applicationId}/hide/seeker")
+    public ResponseEntity<?> hideForSeeker(@PathVariable Long applicationId,
+                                           HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId == null) throw new RuntimeException("User ID missing");
+
+        applicationService.hideApplicationForSeeker(applicationId, userId);
+        return ResponseEntity.ok("Application hidden for seeker");
+    }
+
+    // ---------- NEW: provider hides the completed application from their view ----------
+    @PutMapping("/applications/{applicationId}/hide/provider")
+    public ResponseEntity<?> hideForProvider(@PathVariable Long applicationId,
+                                             HttpServletRequest request) {
+        Long providerId = (Long) request.getAttribute("userId"); // provider's userId in token
+        if (providerId == null) throw new RuntimeException("Provider ID missing");
+
+        applicationService.hideApplicationForProvider(applicationId, providerId);
+        return ResponseEntity.ok("Application hidden for provider");
+    }
 }

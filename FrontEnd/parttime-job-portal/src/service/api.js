@@ -52,6 +52,7 @@ export const getAppliedJobs = () => API.get("/api/jobs/applied");
 export const deleteApplication = (id) =>
   API.delete(`/api/jobs/applications/${id}`);
 
+
 // SAVE / UNSAVE JOB
 export const saveJob = (jobId) => API.post(`/api/jobs/${jobId}/save`);
 export const unsaveJob = (jobId) => API.delete(`/api/jobs/${jobId}/save`);
@@ -74,6 +75,11 @@ export const deleteProvider = (id) => API.delete(`/api/admin/providers/${id}`);
 export const getAllApplicationRecords = () =>
   API.get("/api/admin/applications");
 
+export const providerHideApplication = (id) =>
+  API.put(`/api/jobs/applications/${id}/hide/provider`);
+
+export const seekerHideApplication = (id) =>
+  API.put(`/api/jobs/applications/${id}/hide/seeker`);
 
 
 export default API;

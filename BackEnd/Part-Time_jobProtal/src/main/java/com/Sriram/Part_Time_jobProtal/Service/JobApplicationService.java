@@ -19,5 +19,8 @@ public interface JobApplicationService {
 
     //for withdraw request
     void withdrawApplication(Long applicationId, Long seekerId);
+    void hideApplicationForSeeker(Long applicationId, Long seekerUserId);
+
+    void hideApplicationForProvider(Long applicationId, Long providerUserId);
 
 }
