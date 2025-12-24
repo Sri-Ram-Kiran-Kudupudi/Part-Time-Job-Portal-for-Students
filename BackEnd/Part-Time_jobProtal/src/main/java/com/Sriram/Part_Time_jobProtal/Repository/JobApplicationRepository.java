@@ -10,39 +10,88 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
 
-    // All applications for an applicant (including hidden) - existing
     List<JobApplication> findByApplicant(Applicant applicant);
 
-    // For seeker view: only those not hidden from seeker
     List<JobApplication> findByApplicantAndHiddenFromSeekerFalse(Applicant applicant);
 
-    // All applications for a job (including hidden)
     List<JobApplication> findByJob(Job job);
 
-    // For provider view: only those not hidden from provider
     List<JobApplication> findByJobAndHiddenFromProviderFalse(Job job);
 
     boolean existsByApplicantAndJob(Applicant applicant, Job job);
 
+    // ✅ Correct delete
     @Modifying
-    @Transactional
-    void deleteByApplicant_User_Id(Long userId);
+    @jakarta.transaction.Transactional
+    void deleteByApplicant_Id(Long applicantId);
 
     @Modifying
-    @Transactional
+    @jakarta.transaction.Transactional
     void deleteByJob_Id(Long jobId);
 
-    @Query("SELECT a.chatRoom.id FROM JobApplication a WHERE a.applicant.user.id = :userId")
+    // ✅ Admin safety checks
+    boolean existsByApplicant_User_IdAndStatusAndHiddenFromSeekerFalse(
+            Long userId,
+            String status
+    );
+
+    boolean existsByJob_ProviderIdAndStatusAndHiddenFromProviderFalse(
+            Long providerId,
+            String status
+    );
+
+    // ✅ Chat cleanup helpers
+    @Query("""
+        SELECT a.chatRoom.id
+        FROM JobApplication a
+        WHERE a.applicant.user.id = :userId
+          AND a.chatRoom IS NOT NULL
+    """)
     List<Long> findChatRoomIdsByApplicantUserId(@Param("userId") Long userId);
 
-    @Query("SELECT a.chatRoom.id FROM JobApplication a WHERE a.job.id = :jobId")
+    @Query("""
+        SELECT a.chatRoom.id
+        FROM JobApplication a
+        WHERE a.job.id = :jobId
+          AND a.chatRoom IS NOT NULL
+    """)
     List<Long> findChatRoomIdsByJobId(@Param("jobId") Long jobId);
 
-    // BLOCK admin delete if BOTH accepted
-    boolean existsByApplicant_User_IdAndStatus(Long userId, String status);
+    // ================= CHAT SUPPORT QUERIES =================
 
-    boolean existsByJob_ProviderIdAndStatus(Long providerId, String status);
+    // Seeker USER ID by room
+    @Query("""
+    SELECT a.applicant.user.id
+    FROM JobApplication a
+    WHERE a.chatRoom.id = :roomId
+""")
+    Long findSeekerIdByRoomId(@Param("roomId") Long roomId);
+
+    // Provider USER ID by room
+    @Query("""
+    SELECT a.job.providerId
+    FROM JobApplication a
+    WHERE a.chatRoom.id = :roomId
+""")
+    Long findProviderIdByRoomId(@Param("roomId") Long roomId);
+
+    // Seeker NAME by room
+    @Query("""
+    SELECT a.applicant.user.fullName
+    FROM JobApplication a
+    WHERE a.chatRoom.id = :roomId
+""")
+    String findSeekerNameByRoomId(@Param("roomId") Long roomId);
+
+    // Provider NAME by room
+    @Query("""
+    SELECT u.fullName
+    FROM JobApplication a
+    JOIN User u ON u.id = a.job.providerId
+    WHERE a.chatRoom.id = :roomId
+""")
+    String findProviderNameByRoomId(@Param("roomId") Long roomId);
+
 }

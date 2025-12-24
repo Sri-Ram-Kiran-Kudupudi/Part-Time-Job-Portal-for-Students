@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import "./ProviderJobDetailsPage.css";
 import { toast } from "react-toastify";
 
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+
 import {
   getProviderJobById,
   providerReject,
-  providerHideApplication,  // ⭐ NEW IMPORT
+  providerHideApplication,
+  getUnreadCount,
 } from "../../service/api";
 
 const ProviderJobDetailsPage = () => {
@@ -18,12 +22,20 @@ const ProviderJobDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // ⭐ unread count per chatId
+  const [unreadMap, setUnreadMap] = useState({});
+
+  const stompRef = useRef(null);
+
+  // -----------------------------
+  // FETCH JOB DETAILS
+  // -----------------------------
   const fetchJob = async () => {
     setLoading(true);
     try {
       const res = await getProviderJobById(jobId);
       setJobDetails(res.data);
-    } catch (err) {
+    } catch {
       toast.error("Failed to load job details.");
     }
     setLoading(false);
@@ -33,29 +45,97 @@ const ProviderJobDetailsPage = () => {
     if (jobId) fetchJob();
   }, [jobId]);
 
-  const handleGoBack = () => navigate("/provider/dashboard");
+  // -----------------------------
+  // INITIAL UNREAD COUNT (REST)
+  // -----------------------------
+  useEffect(() => {
+    if (!jobDetails?.applicants) return;
+
+    jobDetails.applicants.forEach((applicant) => {
+      if (!applicant.chatId) return;
+
+      getUnreadCount(applicant.chatId)
+        .then((res) => {
+          setUnreadMap((prev) => ({
+            ...prev,
+            [applicant.chatId]: res.data,
+          }));
+        })
+        .catch(() => {});
+    });
+  }, [jobDetails]);
+
+  // -----------------------------
+  // REALTIME UNREAD UPDATES (WS)
+  // -----------------------------
+  useEffect(() => {
+    if (!jobDetails?.applicants) return;
+
+    const token = localStorage.getItem("token");
+    const socket = new SockJS("http://localhost:8080/ws");
+
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+      debug: () => {},
+      onConnect: () => {
+        jobDetails.applicants.forEach((applicant) => {
+          if (!applicant.chatId) return;
+
+          stompClient.subscribe(
+            `/topic/chat/${applicant.chatId}`,
+            () => {
+              getUnreadCount(applicant.chatId)
+                .then((res) => {
+                  setUnreadMap((prev) => ({
+                    ...prev,
+                    [applicant.chatId]: res.data,
+                  }));
+                })
+                .catch(() => {});
+            }
+          );
+        });
+      },
+    });
+
+    stompClient.activate();
+    stompRef.current = stompClient;
+
+    return () => stompRef.current?.deactivate();
+  }, [jobDetails]);
+
+  // -----------------------------
+  // HANDLERS
+  // -----------------------------
+ const handleGoBack = () => navigate(-1);
+
 
   const handleReject = async (applicationId) => {
     try {
       await providerReject(applicationId);
       toast.info("Applicant rejected");
       fetchJob();
-    } catch (err) {
+    } catch {
       toast.error("Failed to reject applicant");
     }
   };
 
-  // ⭐ NEW: Provider Hide (Soft Remove)
   const handleProviderHide = async (applicationId) => {
     try {
       await providerHideApplication(applicationId);
       toast.success("Applicant removed from list");
       fetchJob();
-    } catch (err) {
+    } catch {
       toast.error("Failed to remove applicant");
     }
   };
 
+  // -----------------------------
+  // LOADING / ERROR UI
+  // -----------------------------
   if (loading) {
     return (
       <div className="flex-center" style={{ height: "80vh", fontSize: "1.2rem" }}>
@@ -66,8 +146,10 @@ const ProviderJobDetailsPage = () => {
 
   if (!jobDetails) {
     return (
-      <div className="flex-center"
-        style={{ height: "80vh", color: "red", fontSize: "1.2rem" }}>
+      <div
+        className="flex-center"
+        style={{ height: "80vh", color: "red", fontSize: "1.2rem" }}
+      >
         Job not found.
       </div>
     );
@@ -75,18 +157,25 @@ const ProviderJobDetailsPage = () => {
 
   const applicants = jobDetails.applicants || [];
 
+  // ✅ NULL-SAFE SEARCH
   const filteredApplicants = applicants.filter((a) =>
-    a.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (a.name || "")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
   );
 
+  // -----------------------------
+  // RENDER
+  // -----------------------------
   return (
     <div className="provider-details-page">
       <Header title="Job Posting Details" />
 
       <main className="details-main-content">
-        <button onClick={handleGoBack} className="btn-back-link">
-          ← Back to Dashboard
-        </button>
+       <button onClick={handleGoBack} className="btn-back-link">
+        ← Back
+      </button>
+
 
         {/* JOB DETAILS */}
         <div className="details-card">
@@ -98,7 +187,7 @@ const ProviderJobDetailsPage = () => {
             <p><strong>🕒 Timing:</strong> {jobDetails.timing}</p>
             <p><strong>💵 Salary:</strong> {jobDetails.salary}</p>
             <p className="col-span-2">
-              <strong>📍 Location:</strong>
+              <strong>📍 Location:</strong>{" "}
               {jobDetails.city}, {jobDetails.district}, {jobDetails.state}
             </p>
           </div>
@@ -125,31 +214,31 @@ const ProviderJobDetailsPage = () => {
 
           <div className="applicants-card-list">
             {filteredApplicants.map((applicant) => (
-              <div className="applicant-card-item" key={applicant.applicationId}>
-
-                {/* LEFT SECTION */}
+              <div
+                className="applicant-card-item"
+                key={applicant.applicationId}
+              >
+                {/* LEFT */}
                 <div className="applicant-left">
                   <div
                     className="applicant-avatar"
-                    onClick={() => navigate(`/applicant/info/${applicant.userId}`)}
+                    onClick={() =>
+                      navigate(`/applicant/info/${applicant.userId}`)
+                    }
                   >
-                    {applicant.name.charAt(0)}
+                    {applicant.name?.charAt(0)}
                   </div>
 
                   <div className="applicant-info">
-                    <h3 style={{
-                      fontSize: "20px",
-                      color: "#2563eb",
-                      fontWeight: "600"
-                    }}>
+                    <h3>
                       {applicant.name}
-
-                      <span style={{
-                        color: "#6b7280",
-                        fontSize: "14px",
-                        marginLeft: "10px",
-                        fontWeight: "400"
-                      }}>
+                      <span
+                        style={{
+                          color: "#6b7280",
+                          fontSize: "14px",
+                          marginLeft: "10px",
+                        }}
+                      >
                         Age: {applicant.age}
                       </span>
                     </h3>
@@ -160,49 +249,60 @@ const ProviderJobDetailsPage = () => {
                   </div>
                 </div>
 
-                {/* ACTION BUTTONS */}
+                {/* ACTIONS */}
                 <div className="applicant-actions">
-                  
-                  {/* ⭐ NEW — REMOVE BUTTON for provider */}
                   {applicant.status === "both_accepted" && (
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleProviderHide(applicant.applicationId)}
-                    >
-                      Remove
-                    </button>
-                  )}
-
-                  {applicant.status === "both_accepted" ? (
-                    <button
-                      onClick={() => navigate(`/chat/${applicant.chatId}`)}
-                      className="btn btn-success btn-chat"
-                    >
-                      💬 Chat
-                    </button>
-                  ) : applicant.status !== "rejected" ? (
                     <>
                       <button
+                        className="btn btn-danger remove-btn"
                         onClick={() =>
-                          navigate(
-                            `/provider/agreement/${jobDetails.id}/${applicant.userId}/${applicant.applicationId}`
-                          )
+                          handleProviderHide(applicant.applicationId)
                         }
-                        className="btn btn-primary"
                       >
-                        Accept
+                        Remove
                       </button>
 
                       <button
-                        onClick={() => handleReject(applicant.applicationId)}
-                        className="btn btn-danger"
+                        onClick={() =>
+                          navigate(`/chat/${applicant.chatId}`)
+                        }
+                        className="btn btn-primary chat-btn"
                       >
-                        Reject
+                        💬 Chat
+                        {unreadMap[applicant.chatId] > 0 && (
+                          <span className="chat-badge">
+                            {unreadMap[applicant.chatId]}
+                          </span>
+                        )}
                       </button>
                     </>
-                  ) : null}
-                </div>
+                  )}
 
+                  {applicant.status !== "both_accepted" &&
+                    applicant.status !== "rejected" && (
+                      <>
+                        <button
+                          onClick={() =>
+                            navigate(
+                              `/provider/agreement/${jobDetails.id}/${applicant.userId}/${applicant.applicationId}`
+                            )
+                          }
+                          className="btn btn-primary"
+                        >
+                          Accept
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            handleReject(applicant.applicationId)
+                          }
+                          className="btn btn-danger"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                </div>
               </div>
             ))}
           </div>

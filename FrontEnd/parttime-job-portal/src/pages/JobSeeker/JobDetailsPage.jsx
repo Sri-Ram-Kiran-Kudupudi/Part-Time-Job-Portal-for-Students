@@ -96,20 +96,18 @@ const JobDetailsPage = () => {
           </div>
 
           <div className="details-grid">
-            <DetailItem icon="🕒" label="Timing" value={job.timing} />
-            <DetailItem icon="📍" label="Location" value={job.location} />
-            <DetailItem icon="💵" label="Salary" value={job.salary} />
+            <DetailItem  label="Timing" value={job.timing} />
+            <DetailItem  label="Location" value={job.location} />
+            <DetailItem  label="Salary" value={job.salary} />
           </div>
           
-          {/* ✅ FIX: Apply button is now present and prominent */}
-          <button className="btn btn-primary w-full mt-4" onClick={handleApply}>
-            Apply Now
-          </button>
+          <button
+        className="btn btn-primary w-full mt-4"
+        onClick={handleApply}
+      >
+        Apply Now
+      </button>
 
-          {/* Save/Unsave button is secondary/outline style */}
-          <button className="btn btn-outline-primary w-full mt-3" onClick={handleSaveToggle}>
-            {isSaved ? "Unsave Job" : "Save Job"}
-          </button>
         </div>
       </main>
     </div>

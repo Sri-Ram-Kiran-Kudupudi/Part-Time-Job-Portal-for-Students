@@ -11,14 +11,16 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "ThisIsAVeryLongSecretKeyForJwtTokenWhichShouldBeAtLeast32Characters";
-    private final long EXPIRATION = 1000 * 60 * 60; // 1 hr
+    private final String SECRET =
+            "ThisIsAVeryLongSecretKeyForJwtTokenWhichShouldBeAtLeast32Characters";
+    private final long EXPIRATION = 1000 * 60 * 60; // 1 hour
 
+    // 🔐 Create signing key
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    // TOKEN → email + role + userId
+    // ✅ Generate token with email, role, userId
     public String generateToken(String email, String role, Long userId) {
         return Jwts.builder()
                 .setSubject(email)
@@ -30,21 +32,24 @@ public class JwtUtil {
                 .compact();
     }
 
+    // 📩 Extract email
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
 
+    // 👤 Extract role
     public Role extractRole(String token) {
-        String full = extractClaims(token).get("role").toString();
-        return Role.valueOf(full.replace("ROLE_", ""));
+        String fullRole = extractClaims(token).get("role").toString();
+        return Role.valueOf(fullRole.replace("ROLE_", ""));
     }
 
-    // REQUIRED FOR APPLY JOB
+    // 🆔 Extract userId (needed for Apply Job)
     public Long extractUserId(String token) {
         Object idObj = extractClaims(token).get("userId");
         return Long.valueOf(idObj.toString());
     }
 
+    // 📦 Extract all claims
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -53,10 +58,12 @@ public class JwtUtil {
                 .getBody();
     }
 
+    // ⏰ Check expiration
     public boolean isTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
     }
 
+    // ✅ Validate token
     public boolean isValid(String token, String email) {
         return email.equals(extractEmail(token)) && !isTokenExpired(token);
     }

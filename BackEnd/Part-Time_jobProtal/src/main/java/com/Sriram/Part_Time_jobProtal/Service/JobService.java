@@ -21,6 +21,6 @@ public interface JobService {
     List<JobResponse> getAllJobs(String search, String city, String type, String salary);
 
     // ⭐ provider sees applicants
-    ProviderJobResponse getJobWithApplicants(Long jobId);
+    ProviderJobResponse getJobWithApplicants(Long jobId,Long providerId);
 
 }

@@ -15,6 +15,7 @@ import com.Sriram.Part_Time_jobProtal.Exception.UnauthorizedException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -124,12 +125,17 @@ public class JobServiceImpl implements JobService {
                 .stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    // ⭐ PROVIDER SEES ONLY APPLICATIONS NOT HIDDEN FROM PROVIDER
+    @Transactional(readOnly = true)
     @Override
-    public ProviderJobResponse getJobWithApplicants(Long jobId) {
+    public ProviderJobResponse getJobWithApplicants(Long jobId, Long providerId) {
 
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
+
+        // ✅ PROVIDER OWNERSHIP CHECK
+        if (!job.getProviderId().equals(providerId)) {
+            throw new UnauthorizedException("You cannot access this job");
+        }
 
         List<JobApplication> apps =
                 applicationRepository.findByJobAndHiddenFromProviderFalse(job);
@@ -140,12 +146,14 @@ public class JobServiceImpl implements JobService {
                     ? app.getChatRoom().getId()
                     : null;
 
+            Applicant applicant = app.getApplicant();
+
             return ProviderApplicantDTO.builder()
                     .applicationId(app.getId())
-                    .applicantId(app.getApplicant().getId())
-                    .userId(app.getApplicant().getUser().getId())
-                    .name(app.getApplicant().getUser().getFullName())
-                    .age(app.getApplicant().getAge())
+                    .applicantId(applicant.getId())
+                    .userId(applicant.getUser().getId())
+                    .name(applicant.getUser().getFullName())
+                    .age(applicant.getAge() != null ? applicant.getAge() : 0) // ✅ NULL SAFE
                     .status(app.getStatus())
                     .chatId(chatId)
                     .build();
@@ -164,4 +172,5 @@ public class JobServiceImpl implements JobService {
                 .applicants(applicantDTOs)
                 .build();
     }
+
 }

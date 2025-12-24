@@ -16,9 +16,10 @@ public class Applicant {
     private Long id;
 
     // Link to User
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
 
     private Integer age;
     private String gender;

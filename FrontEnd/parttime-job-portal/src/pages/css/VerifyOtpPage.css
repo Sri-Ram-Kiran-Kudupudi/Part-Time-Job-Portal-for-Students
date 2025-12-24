@@ -1,0 +1,157 @@
+/* ==================================================
+   VERIFY OTP PAGE — FINAL (PRODUCTION READY)
+================================================== */
+
+/* 1. Layout */
+.verify-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        to bottom right,
+        var(--background),
+        var(--primary-light)
+    );
+
+    padding: 20px;
+}
+
+/* 2. Card */
+.verify-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    padding: 28px;
+
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--secondary);
+    box-shadow: var(--shadow-md);
+
+    text-align: center;
+    animation: fadeUp 0.5s ease;
+}
+
+/* 3. Title */
+.verify-title {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 6px;
+}
+
+/* 4. Email */
+.verify-email {
+    font-size: 0.95rem;
+    color: var(--text-gray);
+    margin-bottom: 20px;
+    word-break: break-word;
+}
+
+/* 5. OTP Input */
+.verify-input {
+    width: 100%;
+    padding: 13px;
+    font-size: 1.05rem;
+
+    letter-spacing: 0.3em;
+    text-align: center;
+
+    border-radius: var(--radius-md);
+    border: 1px solid var(--secondary);
+    outline: none;
+
+    transition: 0.25s ease;
+}
+
+.verify-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
+}
+
+/* 6. Verify Button */
+.verify-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px;
+
+    background: var(--primary);
+    color: #ffffff;
+
+    border: none;
+    border-radius: var(--radius-md);
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: 0.25s ease;
+}
+
+.verify-btn:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.verify-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* 7. Countdown */
+.verify-timer {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    color: var(--text-gray);
+}
+
+.verify-timer span {
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* 8. Resend OTP Button */
+.resend-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+
+    background: #e5e7eb;
+    color: #6b7280;
+
+    border: none;
+    border-radius: var(--radius-md);
+
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    cursor: not-allowed;
+    transition: 0.25s ease;
+}
+
+/* Active state */
+.resend-btn.active {
+    background: #ef4444;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+
+.resend-btn.active:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* 9. Animation */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

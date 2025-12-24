@@ -7,6 +7,14 @@
 .app-background {
   background-color: var(--background);
 }
+.apply-btn {
+  background: var(--btn-bg);
+  color: white;
+}
+
+.apply-btn:hover {
+  background: var(--btn-bg-hover);
+}
 
 .job-details-container {
   /* Adjusted for general spacing and max-width */

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./css/RegisterPage.css";
 
 const RegisterPage = () => {
@@ -8,270 +9,179 @@ const RegisterPage = () => {
 
   const [formData, setFormData] = useState({
     fullName: "",
-    age: "",
-    gender: "Male",
     email: "",
-    phone: "",
     password: "",
     confirmPassword: "",
     role: "",
-    city: "",
-    district: "",
-    state: "",
-    skills: "",
-    experience: "",
   });
 
-  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Handle input change
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // ---------------------------
-  // VALIDATION
-  // ---------------------------
-  const validateForm = () => {
-    if (!formData.fullName || !formData.email || !formData.password) {
-      toast.error("Full name, email & password are required.");
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match.");
-      return false;
-    }
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
-      return false;
-    }
-    return true;
-  };
-
-  // ---------------------------
-  // SUBMIT FORM
-  // ---------------------------
+  // Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    if (!validateForm()) return;
+    const fullName = formData.fullName.trim();
+    const email = formData.email.trim().toLowerCase();
+    const password = formData.password;
+    const confirmPassword = formData.confirmPassword;
+    const role = formData.role;
 
-    const payload = {
-      fullName: formData.fullName,
-      age: formData.role === "seeker" ? Number(formData.age) : null,
-      gender: formData.role === "seeker" ? formData.gender : null,
-      phone: formData.phone || null, // <= ADDED
-      email: formData.email,
-      password: formData.password,
-      role: formData.role.toUpperCase(),
+    if (!fullName || !email || !password || !confirmPassword || !role) {
+      toast.error("All fields are required");
+      return;
+    }
 
-      city: formData.role === "seeker" ? formData.city : null,
-      district: formData.role === "seeker" ? formData.district : null,
-      state: formData.role === "seeker" ? formData.state : null,
-      skills: formData.role === "seeker" ? formData.skills : null,
-      experience: formData.role === "seeker" ? formData.experience : null,
-    };
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
 
     try {
-      const response = await fetch("http://localhost:8080/api/auth/register", {
+      setLoading(true);
+
+      const res = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+          role: role.toUpperCase(),
+        }),
       });
 
-      if (!response.ok) {
-        toast.error("Email already exists or invalid details.");
+      if (res.status === 409) {
+        toast.error("Email already exists");
         return;
       }
 
-      toast.success("Account created successfully! Please login.");
+      if (!res.ok) {
+        toast.error("Registration failed");
+        return;
+      }
 
-      setTimeout(() => navigate("/login"), 700);
+      toast.success("OTP sent to your email");
+      navigate("/verify-otp", { state: { email } });
 
-    } catch (err) {
-      toast.error("Something went wrong. Try again.");
+    } catch (error) {
+      toast.error("Server error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="register-container">
       <div className="register-card">
-        <h2 className="register-title">Create Your Account</h2>
+        <h2 className="register-title">Create Account</h2>
+
+        <p className="register-subtext">
+          We’ll send a verification OTP to your email
+        </p>
 
         <form onSubmit={handleSubmit} className="form-spacing">
-
-          {/* Full Name */}
+          
           <div className="form-group">
-            <label className="form-label">Full Name</label>
+            <label>Full Name</label>
             <input
+              type="text"
               name="fullName"
-              className="form-control-base"
               value={formData.fullName}
               onChange={handleChange}
-              required
+              placeholder="Enter full name"
             />
           </div>
 
-          {/* Phone */}
           <div className="form-group">
-            <label className="form-label">Phone Number</label>
-            <input
-              name="phone"
-              className="form-control-base"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Age, Gender only for seeker */}
-          {formData.role === "seeker" && (
-            <>
-              <div className="form-group">
-                <label className="form-label">Age</label>
-                <input
-                  type="number"
-                  name="age"
-                  className="form-control-base"
-                  value={formData.age}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Gender</label>
-                <select
-                  name="gender"
-                  className="form-control-base"
-                  value={formData.gender}
-                  onChange={handleChange}
-                >
-                  <option>Male</option>
-                  <option>Female</option>
-                  <option>Other</option>
-                </select>
-              </div>
-            </>
-          )}
-
-          {/* Email */}
-          <div className="form-group">
-            <label className="form-label">Email</label>
+            <label>Email</label>
             <input
               type="email"
               name="email"
-              className="form-control-base"
               value={formData.email}
               onChange={handleChange}
-              required
+              placeholder="Enter email"
             />
           </div>
 
-          {/* Password */}
-          <div className="form-group">
-            <label className="form-label">Password</label>
+          {/* PASSWORD */}
+          <div className="form-group password-input-wrapper">
+            <label>Password</label>
+
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
-              className="form-control-base"
               value={formData.password}
               onChange={handleChange}
-              required
+              placeholder="Enter password"
             />
+
+            <button
+              type="button"
+              className="password-toggle-btn"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
           </div>
 
-          {/* Confirm Password */}
-          <div className="form-group">
-            <label className="form-label">Confirm Password</label>
+          {/* CONFIRM PASSWORD */}
+          <div className="form-group password-input-wrapper">
+            <label>Confirm Password</label>
+
             <input
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
-              className="form-control-base"
               value={formData.confirmPassword}
               onChange={handleChange}
-              required
+              placeholder="Confirm password"
             />
+
+            <button
+              type="button"
+              className="password-toggle-btn"
+              onClick={() => setShowConfirmPassword((prev) => !prev)}
+            >
+              {showConfirmPassword ? "Hide" : "Show"}
+            </button>
           </div>
 
-          {/* Role */}
           <div className="form-group">
-            <label className="form-label">Role</label>
-            <select
-              name="role"
-              className="form-control-base"
-              value={formData.role}
-              onChange={handleChange}
-              required
-            >
+            <label>Role</label>
+            <select name="role" value={formData.role} onChange={handleChange}>
               <option value="">Select Role</option>
               <option value="seeker">Job Seeker</option>
               <option value="provider">Job Provider</option>
             </select>
           </div>
 
-          {/* Extra fields for seeker */}
-          {formData.role === "seeker" && (
-            <>
-              <div className="form-group">
-                <label className="form-label">City</label>
-                <input
-                  name="city"
-                  className="form-control-base"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">District</label>
-                <input
-                  name="district"
-                  className="form-control-base"
-                  value={formData.district}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">State</label>
-                <input
-                  name="state"
-                  className="form-control-base"
-                  value={formData.state}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Skills</label>
-                <input
-                  name="skills"
-                  className="form-control-base"
-                  value={formData.skills}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Experience</label>
-                <input
-                  name="experience"
-                  className="form-control-base"
-                  value={formData.experience}
-                  onChange={handleChange}
-                />
-              </div>
-            </>
-          )}
-
-          {error && <p className="error-message">{error}</p>}
-
-          <button type="submit" className="register-btn-full">
-            Register
+          <button
+            type="submit"
+            className="register-btn-full"
+            disabled={loading}
+          >
+            {loading ? "Sending OTP..." : "Register"}
           </button>
         </form>
 
         <p className="register-login-text">
-          Already have an account? <Link to="/login">Login</Link>
+          Already verified? <Link to="/login">Login</Link>
         </p>
       </div>
     </div>

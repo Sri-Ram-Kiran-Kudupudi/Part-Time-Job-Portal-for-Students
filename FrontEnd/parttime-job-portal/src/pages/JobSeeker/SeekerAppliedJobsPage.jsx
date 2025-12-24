@@ -1,80 +1,141 @@
-import React, { useEffect, useState } from "react";
+// pages/SeekerAppliedJobsPage.jsx
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import "./SeekerAppliedJobsPage.css";
+
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
+
 import {
   getAppliedJobs,
   deleteApplication,
   seekerHideApplication,
+  getUnreadCount,
 } from "../../service/api";
+
 import { toast } from "react-toastify";
 
+/* ===============================
+   APPLIED JOB CARD
+================================ */
 const AppliedJobCard = ({ job, onDelete, onHide }) => {
   const navigate = useNavigate();
+  const stompRef = useRef(null);
 
   const normalizedStatus = job.status?.toLowerCase().replace(/\s+/g, "_");
   const isBothAccepted = normalizedStatus === "both_accepted";
+  const isRejected = normalizedStatus === "rejected";
+  const canRemove = isBothAccepted || isRejected;
+
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Initial unread count
+  useEffect(() => {
+    if (!job.chatId || !isBothAccepted) return;
+
+    getUnreadCount(job.chatId)
+      .then((res) => setUnreadCount(res.data))
+      .catch(() => {});
+  }, [job.chatId, isBothAccepted]);
+
+  // Realtime unread update
+  useEffect(() => {
+    if (!job.chatId || !isBothAccepted) return;
+
+    const token = localStorage.getItem("token");
+    const socket = new SockJS("http://localhost:8080/ws");
+
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+      onConnect: () => {
+        stompClient.subscribe(`/topic/chat/${job.chatId}`, () => {
+          getUnreadCount(job.chatId)
+            .then((res) => setUnreadCount(res.data))
+            .catch(() => {});
+        });
+      },
+      debug: () => {},
+    });
+
+    stompClient.activate();
+    stompRef.current = stompClient;
+
+    return () => stompRef.current?.deactivate();
+  }, [job.chatId, isBothAccepted]);
 
   return (
     <div className="applied-job-card">
       <div>
         <h3>{job.title}</h3>
         <p>Provider: {job.providerName}</p>
-        <p>📍 {job.location}</p>
-        <p>💰 {job.salary}</p>
+        <p>{job.location}</p>
+        <p>{job.salary}</p>
       </div>
 
       <div className="status-box">
+        <div className="action-row">
+          {isBothAccepted && job.chatId && (
+            <button
+              className="btn btn-primary chat-btn"
+              onClick={() => navigate(`/chat/${job.chatId}`)}
+            >
+              💬 Chat
+              {unreadCount > 0 && (
+                <span className="chat-badge">{unreadCount}</span>
+              )}
+            </button>
+          )}
+
+          {!canRemove && (
+            <button
+              className="btn btn-danger"
+              onClick={() => onDelete(job)}
+            >
+              Delete
+            </button>
+          )}
+
+          {canRemove && (
+            <button
+              className="btn btn-danger"
+              onClick={() => onHide(job)}
+            >
+              Remove
+            </button>
+          )}
+        </div>
+
         <span className={`status-badge ${normalizedStatus}`}>
           {job.status.replace("_", " ")}
         </span>
-
-        {/* ⭐ CHAT BUTTON */}
-        {isBothAccepted && job.chatId ? (
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate(`/chat/${job.chatId}`)}
-          >
-            Chat
-          </button>
-        ) : null}
-
-        {/* ⭐ DELETE BEFORE ACCEPTANCE */}
-        {!isBothAccepted && normalizedStatus !== "rejected" && (
-          <button className="btn btn-danger" onClick={() => onDelete(job)}>
-            Delete
-          </button>
-        )}
-
-        {/* ⭐ REMOVE AFTER BOTH ACCEPT */}
-        {isBothAccepted && (
-          <button className="btn btn-danger" onClick={() => onHide(job)}>
-            Remove
-          </button>
-        )}
       </div>
     </div>
   );
 };
 
+/* ===============================
+   SEEKER APPLIED JOBS PAGE
+================================ */
 const SeekerAppliedJobsPage = () => {
   const navigate = useNavigate();
+
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Delete Modal
-  const [showModal, setShowModal] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null);
-
-  // Hide Modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showHideModal, setShowHideModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const loadJobs = async () => {
     try {
       setLoading(true);
       const res = await getAppliedJobs();
       setAppliedJobs(res.data);
-    } catch (err) {
+    } catch {
       toast.error("Failed to fetch applied jobs");
     } finally {
       setLoading(false);
@@ -85,9 +146,10 @@ const SeekerAppliedJobsPage = () => {
     loadJobs();
   }, []);
 
+  /* ---------- ASK CONFIRMATION ---------- */
   const askDelete = (job) => {
     setSelectedJob(job);
-    setShowModal(true);
+    setShowDeleteModal(true);
   };
 
   const askHide = (job) => {
@@ -95,15 +157,16 @@ const SeekerAppliedJobsPage = () => {
     setShowHideModal(true);
   };
 
+  /* ---------- CONFIRM ACTIONS ---------- */
   const confirmDelete = async () => {
     try {
       await deleteApplication(selectedJob.applicationId);
       toast.success("Application withdrawn");
       loadJobs();
-    } catch (err) {
+    } catch {
       toast.error("Could not delete application");
     }
-    setShowModal(false);
+    setShowDeleteModal(false);
     setSelectedJob(null);
   };
 
@@ -112,7 +175,7 @@ const SeekerAppliedJobsPage = () => {
       await seekerHideApplication(selectedJob.applicationId);
       toast.success("Removed from your list");
       loadJobs();
-    } catch (err) {
+    } catch {
       toast.error("Failed to remove application");
     }
     setShowHideModal(false);
@@ -123,7 +186,10 @@ const SeekerAppliedJobsPage = () => {
     <div className="applied-jobs-page">
       <Header title="Your Applied Jobs" />
 
-      <button className="btn-back-link" onClick={() => navigate("/jobs/find")}>
+      <button
+        className="btn-back-link"
+        onClick={() => navigate("/jobs/find")}
+      >
         ← Back to Find Jobs
       </button>
 
@@ -146,22 +212,23 @@ const SeekerAppliedJobsPage = () => {
         </div>
       )}
 
-      {/* DELETE CONFIRM MODAL */}
-      {showModal && (
+      {/* ================= DELETE MODAL ================= */}
+      {showDeleteModal && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h3>Withdraw Application</h3>
-            <p>
-              Remove your application for <b>{selectedJob?.title}</b>?
-            </p>
+            <h3>Withdraw Application?</h3>
+            <p>This action cannot be undone.</p>
 
             <div className="modal-buttons">
-              <button className="btn btn-danger" onClick={confirmDelete}>
-                Yes, Withdraw
+              <button
+                className="btn btn-danger"
+                onClick={confirmDelete}
+              >
+                Yes, Delete
               </button>
               <button
-                className="btn btn-secondary"
-                onClick={() => setShowModal(false)}
+                className="btn btn-outline-primary"
+                onClick={() => setShowDeleteModal(false)}
               >
                 Cancel
               </button>
@@ -170,22 +237,22 @@ const SeekerAppliedJobsPage = () => {
         </div>
       )}
 
-      {/* HIDE AFTER BOTH ACCEPTED */}
+      {/* ================= REMOVE MODAL ================= */}
       {showHideModal && (
         <div className="modal-overlay">
           <div className="modal-box">
-            <h3>Remove From List</h3>
-            <p>
-              Do you want to remove <b>{selectedJob?.title}</b> from your
-              completed jobs?
-            </p>
+            <h3>Remove From List?</h3>
+            <p>You can still access it later if needed.</p>
 
             <div className="modal-buttons">
-              <button className="btn btn-danger" onClick={confirmHide}>
+              <button
+                className="btn btn-danger"
+                onClick={confirmHide}
+              >
                 Yes, Remove
               </button>
               <button
-                className="btn btn-secondary"
+                className="btn btn-outline-primary"
                 onClick={() => setShowHideModal(false)}
               >
                 Cancel

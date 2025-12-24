@@ -24,13 +24,6 @@
     border-right: 2px solid rgba(0,0,0,0.08);
 }
 
-.left-col .panel-card {
-    margin-bottom: 10px;
-    border: 1px solid #e5e5e5;
-    background: #ffffff;
-    border-radius: 10px;
-}
-
 /* ================= MIDDLE COLUMN ================= */
 .middle-col {
     flex-grow: 1;
@@ -49,6 +42,7 @@
     font-weight: 700;
     color: var(--text-gray-900);
     margin-bottom: 12px;
+    margin-left: 60px;
 }
 
 .job-listings-grid-layout {
@@ -83,24 +77,7 @@
     flex-direction: column;
 }
 
-.search-panel-container .panel-card {
-    margin-bottom: 12px;
-}
 
-.applied-button {
-    margin-top: 5px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 6px;
-    background-color: var(--primary);
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.search-panel-container {
-    flex-shrink: 0;
-}
 
 .bottom-panel-content {
     margin-top: 20px;
@@ -112,7 +89,7 @@
 
 .search-input-wrapper {
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 190px;
 }
 
 .search-input-wrapper input {
@@ -130,7 +107,11 @@
 .radius-input-small {
     max-width: 100px;
 }
-
+.custom-ridus{
+     width: 50px;    
+    border: 1px solid gray;
+    border-radius: 4px; 
+}
 /* MAP AREA */
 .map-area {
     flex-grow: 1;
@@ -141,6 +122,7 @@
     padding: 0;
     margin-top: 12px;
     overflow: hidden;
+     border:2px solid rgb(100, 203, 244);
 }
 
 .map-area .job-pin-marker {
@@ -189,12 +171,24 @@
 .search-input-wrapper {
     display: flex;
     align-items: center;
+    margin-top: 8px;
 }
 
-.search-btn {
+
+.search-location-btn{
     margin-left: 6px;
-    padding: 8px 14px;
-    background: var(--primary);
+    padding: 8px 12px;
+     background: var(--btn-bg);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.search-btn{
+    margin-left: 6px;
+    padding: 7px 10px;
+    background: var(--btn-bg);
     color: white;
     border: none;
     border-radius: 6px;
@@ -205,18 +199,10 @@
 .location-search-wrapper {
   display: flex;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: px;
 }
 
-.search-location-btn {
-  padding: 8px 14px;
-  background: var(--primary);
-  border: none;
-  color: white;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-}
+
 
 .map-pin {
   width: 18px;
@@ -225,4 +211,427 @@
   border: 3px solid white;
   border-radius: 50%;
   box-shadow: 0px 0px 6px rgba(0,0,0,0.4);
+}
+/* ================= FILTER BUTTON ================= */
+.filters-btn {
+    position: fixed;
+    top: calc(var(--header-height) + 10px);
+    left: 16px;
+    z-index: 1200;
+
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ================= SLIDING FILTER COLUMN ================= */
+.filters-slide {
+    position: fixed;
+    top: calc(var(--header-height) + 5px);
+    left: 0;
+
+    height: calc(100vh - var(--header-height) - 5px);
+    width: 215px; /* ✅ as requested */
+
+    background: #ffffff;
+    border-right: 2px solid rgba(0,0,0,0.08);
+
+    z-index: 1300;
+
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+
+    overflow-y: auto;
+}
+
+/* When filter is open */
+.filters-slide.open {
+    transform: translateX(0);
+}
+
+/* ================= FILTER HEADER ================= */
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 10px;
+    font-weight: 700;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* Close button */
+.filters-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+/* ================= FIX: SEARCH LOCATION INPUT STYLE ================= */
+.panel-card input[type="text"] {
+    background: white;
+    border: 1px solid #d0d0d0;
+    padding: 8px 10px;
+    border-radius: 6px;
+    outline: none;
+    width: 100%;
+}
+/* ================= FIX: SEARCH LOCATION ALIGNMENT ================= */
+
+/* Make location search behave like search jobs */
+.panel-card .search-location-btn {
+    white-space: nowrap;
+}
+
+.panel-card input[type="text"] {
+    flex: 1;
+    width: auto;          /* ❌ remove full width */
+}
+
+/* Ensure input + button stay in one row */
+.panel-card {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+/* ================= FILTER IMAGE ICON ================= */
+.filters-icon {
+    position: fixed;
+    top:18px;
+    left: 37px;
+    z-index: 40000;
+
+    width: 32px;     /* adjust if needed */
+    height: 32px;
+
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+.filters-icon:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+/* ================= FILTER PUSH LAYOUT ================= */
+
+/* When filter is open, push content */
+.main-row.filter-open .middle-col {
+    margin-left: 200px; /* space for filter panel */
+    transition: margin-left 0.3s ease;
+}
+
+/* Default state */
+.middle-col {
+    transition: margin-left 0.3s ease;
+}
+/* Reduce job cards when filter is open */
+.main-row.filter-open .job-listings-grid-layout {
+    grid-template-columns: repeat(3, 1fr);
+}
+/* ================= FILTER ACCORDION ================= */
+
+.filter-accordion-group {
+    border-bottom: 1px solid #e5e5e5;
+    padding: 6px 0;
+}
+
+.filter-accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    padding: 6px 4px;
+}
+
+
+.filter-accordion-content {
+    margin-top: 6px;
+    padding-left: 6px;
+}
+
+.filter-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+/* ================= FIX FILTER ACCORDION LAYOUT ================= */
+
+/* Make filter panel vertical */
+.filters-slide .panel-card {
+    display: block;
+   padding-left: 15px;;
+}
+
+/* Ensure accordion groups stack vertically */
+.filter-accordion-group {
+    width: 100%;
+}
+/* ================= ACCORDION ARROW (TEXT BASED) ================= */
+
+.accordion-arrow {
+    font-size: 16px;          /* ⬆ increase size */
+    font-weight: 600;         /* make it visible */
+    color: #a39e9e;
+
+    width: 24px;              /* ⬅ space for arrow */
+    height: 24px;
+
+    display: flex;            /* center arrow */
+    align-items: center;
+    justify-content: center;
+
+    margin-left: auto;        /* push arrow to right */
+}
+
+/* =====================================
+   🔥 RESPONSIVE UX FIX (SAFE OVERRIDE)
+   Uses ONLY :root colors
+===================================== */
+
+/* ---------- COMMON SAFETY ---------- */
+.right-col,
+.map-area {
+  max-width: 100%;
+}
+
+/* Prevent map from breaking layout */
+.map-area {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* Never allow map to take full screen */
+.map-area iframe,
+.map-area > div {
+  max-width: 100% !important;
+  height: 100% !important;
+}
+
+/* =====================================
+   📱 MOBILE & SMALL SCREENS
+===================================== */
+@media (max-width: 768px) {
+
+  /* Stack columns vertically */
+  .main-row {
+    flex-direction: column;
+    height: auto;
+  }
+
+  /* Hide left filters (use slide button) */
+  .left-col {
+    display: none;
+  }
+
+  /* Middle content first */
+  .middle-col {
+    width: 100%;
+    border-right: none;
+  }
+
+  .middle-scroll {
+    padding: 10px;
+  }
+
+  /* JOB CARDS → HORIZONTAL SCROLL */
+  .job-listings-grid-layout {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 12px;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .job-card {
+    min-width: 260px;
+    max-width: 260px;
+    aspect-ratio: auto;
+    scroll-snap-align: start;
+    border-radius: var(--radius-md);
+  }
+
+  /* Right column moves BELOW cards */
+  .right-col {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Search first */
+  .search-input-wrapper {
+    margin-bottom: 12px;
+  }
+
+  /* Location search */
+  .location-search-wrapper {
+    margin-bottom: 10px;
+  }
+
+  /* Google map SMALL & CLEAN */
+  .map-area {
+    height: 220px;
+    min-height: 220px;
+    margin-top: 12px;
+    border: 1px solid var(--border);
+  }
+}
+
+/* =====================================
+   📱 VERY SMALL DEVICES
+===================================== */
+@media (max-width: 480px) {
+
+  .job-card {
+    min-width: 230px;
+  }
+
+  .search-btn,
+  .search-location-btn {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .map-area {
+    height: 200px;
+    min-height: 200px;
+  }
+}
+
+/* =====================================
+   🧠 WINDOW RESIZE BUG FIX
+===================================== */
+@media (max-height: 700px) {
+  .map-area {
+    max-height: 240px;
+  }
+}
+/* EXTRA SAFETY: hide parent scrollbars */
+.middle-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.middle-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* =====================================
+   📱 MOBILE ORDER FIX (JOBS → MAP)
+===================================== */
+@media (max-width: 768px) {
+
+  /* Ensure right column is flex */
+  .right-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 1️⃣ Jobs first */
+  .job-listings-grid-layout {
+    order: 1;
+  }
+
+  /* 2️⃣ Search inputs next */
+  .search-input-wrapper,
+  .location-search-wrapper {
+    order: 2;
+  }
+
+  /* 3️⃣ Google map LAST */
+  .map-area {
+    order: 3;
+  }
+}
+/* =====================================
+   📱 MOBILE & TABLET (768px and below)
+===================================== */
+@media (max-width: 768px) {
+  .main-row {
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto; /* Allow full page scroll on mobile */
+  }
+
+  /* --- 1. HIDE MAP AREA COMPLETELY --- */
+  .map-area {
+    display: none !important; /* Removes map from DOM at 768px */
+  }
+
+  /* --- 2. HORIZONTAL JOBS SCROLL --- */
+  .middle-col {
+    order: 1; /* Jobs at the top */
+    width: 100%;
+    padding: 0;
+    border-right: none;
+  }
+
+  .job-listings-grid-layout {
+    display: flex; /* Switch from grid to flex for horizontal scroll */
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 15px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* Smooth inertia scroll for iOS */
+  }
+
+  .job-card {
+    min-width: 280px; /* Fixed width for horizontal items */
+    max-width: 280px;
+    aspect-ratio: auto;
+    height: 180px; /* Consistent height for horizontal view */
+    scroll-snap-align: center;
+    flex-shrink: 0; /* Prevent cards from squishing */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* --- 3. SEARCH PANEL BELOW JOBS --- */
+  .right-col {
+    order: 2;
+    width: 100%;
+    padding: 20px;
+    height: auto;
+    background: #ffffff;
+  }
+
+  .search-input-wrapper {
+    margin-bottom: 15px; /* Reduce large desktop margin */
+  }
+}
+
+/* --- UX ENHANCEMENT: Hide scrollbar but keep functionality --- */
+.job-listings-grid-layout::-webkit-scrollbar {
+  display: none;
+}
+.job-listings-grid-layout {
+  scrollbar-width: none;
+}
+.accordion-arrow {
+  font-size: 18px;        /* base size */
+  font-weight: 700;
+  color: #a39e9e;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  transform: scale(1); /* 🔥 MAKES > BIGGER */
 }

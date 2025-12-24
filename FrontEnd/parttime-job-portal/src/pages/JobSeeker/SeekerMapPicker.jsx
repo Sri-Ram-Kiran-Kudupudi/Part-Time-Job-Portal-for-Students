@@ -198,10 +198,6 @@ const SeekerMapPicker = ({ location, setLocation, jobPins = [] }) => {
             )
         )}
       </MapContainer>
-
-      <p className="map-address">
-        <b>Selected Address:</b> {address || "Tap on the map to choose location"}
-      </p>
     </div>
   );
 };

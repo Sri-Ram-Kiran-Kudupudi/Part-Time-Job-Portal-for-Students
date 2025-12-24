@@ -1,47 +1,69 @@
-// src/context/AuthContext.jsx
 import React, { createContext, useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+
   const [user, setUser] = useState({
     isLoggedIn: false,
     id: null,
-    username: null, // full name stored here
+    username: null,
     email: null,
     phone: null,
     role: null,
     token: null,
   });
 
-  // Load saved user from localStorage
+  // 🔐 Restore auth on refresh WITH EXPIRY CHECK
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const id = localStorage.getItem("id");
-    const username = localStorage.getItem("username");
-    const email = localStorage.getItem("email");
-    const phone = localStorage.getItem("phone");
-    const role = localStorage.getItem("role");
 
-    if (token && id && role) {
+    // ❌ No token → logout
+    if (!token || token === "null" || token === "undefined") {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // ✅ Decode JWT
+      const decoded = jwtDecode(token);
+
+      // ⏰ Check expiration
+      if (decoded.exp * 1000 < Date.now()) {
+        toast.info("Session expired. Please login again.");
+        localStorage.clear();
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Token valid → restore user
       setUser({
         isLoggedIn: true,
-        id: Number(id),
-        username,
-        email,
-        phone,
-        role,
+        id: Number(localStorage.getItem("id")),
+        username: localStorage.getItem("username"),
+        email: localStorage.getItem("email"),
+        phone: localStorage.getItem("phone"),
+        role: localStorage.getItem("role"),
         token,
       });
+    } catch (error) {
+      // ❌ Invalid token
+      console.error("Invalid token. Logging out...");
+      localStorage.clear();
     }
+
+    setLoading(false);
   }, []);
 
-  // Login — save in state + localStorage
+  // 🔑 Login
   const login = (userData) => {
     const finalName = userData.fullName || userData.username || "";
 
-    localStorage.setItem("token", userData.token || "");
-    localStorage.setItem("id", String(userData.id || ""));
+    localStorage.setItem("token", userData.token);
+    localStorage.setItem("id", String(userData.id));
     localStorage.setItem("username", finalName);
     localStorage.setItem("email", userData.email || "");
     localStorage.setItem("phone", userData.phone || "");
@@ -58,17 +80,18 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  // ⭐ FIX — Update name instantly after saving profile
+  // 📝 Update profile info
   const updateUserState = (updates) => {
     const newData = { ...updates };
 
-    // If fullName updated → update username
     if (updates.fullName) {
       newData.username = updates.fullName;
       localStorage.setItem("username", updates.fullName);
     }
 
-    if (updates.phone) localStorage.setItem("phone", updates.phone);
+    if (updates.phone) {
+      localStorage.setItem("phone", updates.phone);
+    }
 
     setUser((prev) => ({
       ...prev,
@@ -76,14 +99,9 @@ export const AuthProvider = ({ children }) => {
     }));
   };
 
-  // Logout — clear everything
+  // 🚪 Logout
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("id");
-    localStorage.removeItem("username");
-    localStorage.removeItem("email");
-    localStorage.removeItem("phone");
-    localStorage.removeItem("role");
+    localStorage.clear();
 
     setUser({
       isLoggedIn: false,
@@ -97,8 +115,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUserState }}>
-      {children}
+    <AuthContext.Provider
+      value={{ user, login, logout, updateUserState, loading }}
+    >
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

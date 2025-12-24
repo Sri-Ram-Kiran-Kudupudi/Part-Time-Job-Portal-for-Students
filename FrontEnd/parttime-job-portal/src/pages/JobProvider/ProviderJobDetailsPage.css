@@ -245,6 +245,7 @@
 .btn-danger {
     background: #ef4444;
     color: white;
+    margin-top: 10px;
 }
 .btn-primary {
     background: var(--primary);
@@ -349,4 +350,51 @@
 }
 
 
+.chat-btn {
+    position: relative;
+}
+.applicant-actions {
+  display: flex;
+  align-items: center;   /* ✅ SAME HEIGHT */
+  gap: 0.5rem;
+}
 
+.chat-badge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+
+  width: 18px;          /* ✅ fixed width */
+  height: 18px;         /* ✅ fixed height */
+  border-radius: 50%;   /* ✅ perfect circle */
+
+  background: #dc2626;
+  color: #ffffff;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  display: flex;        /* ✅ center number */
+  align-items: center;
+  justify-content: center;
+
+  line-height: 1;
+}
+
+.applicant-actions .btn {
+  height: 36px;
+  min-width: 90px;
+
+  padding: 0 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  line-height: 1;          /* 🔑 CRITICAL */
+  vertical-align: middle; /* 🔑 CRITICAL */
+
+  box-sizing: border-box;
+}

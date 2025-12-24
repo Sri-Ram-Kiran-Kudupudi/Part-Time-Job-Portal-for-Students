@@ -33,11 +33,15 @@ public class JobProviderController {
         return ResponseEntity.ok(jobService.getJobsByProvider(user.getId()));
     }
 
-    // ⭐ Returns job details + applicants (Provider view)
+    @PreAuthorize("hasRole('PROVIDER')")
     @GetMapping("/job/{id}")
-    public ResponseEntity<?> getJob(@PathVariable Long id) {
-        return ResponseEntity.ok(jobService.getJobWithApplicants(id));
+    public ResponseEntity<?> getJob(@PathVariable Long id,
+                                    @AuthenticationPrincipal CustomUserDetails user) {
+        return ResponseEntity.ok(
+                jobService.getJobWithApplicants(id, user.getId())
+        );
     }
+
 
     @PreAuthorize("hasRole('PROVIDER')")
     @PutMapping("/job/{id}")

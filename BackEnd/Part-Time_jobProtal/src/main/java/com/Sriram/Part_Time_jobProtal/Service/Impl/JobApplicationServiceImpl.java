@@ -8,7 +8,7 @@ import com.Sriram.Part_Time_jobProtal.Repository.*;
 import com.Sriram.Part_Time_jobProtal.Service.JobApplicationService;
 import com.Sriram.Part_Time_jobProtal.Exception.AlreadyAppliedException;
 import com.Sriram.Part_Time_jobProtal.Exception.ResourceNotFoundException;
-
+import com.Sriram.Part_Time_jobProtal.Model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,17 +136,29 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     // PROVIDER REJECT
     // -----------------------------------------------------------
     @Override
+    @Transactional
     public ApplicationResponse providerReject(Long applicationId) {
 
         JobApplication app = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
+        // Mark as rejected
         app.setStatus("rejected");
+
+        // ❗ DO NOT hide automatically
+        app.setHiddenFromSeeker(false);
+        app.setHiddenFromProvider(false);
+
+        // ❗ DO NOT delete here
         JobApplication saved = applicationRepository.save(app);
 
-        User provider = userRepository.findById(app.getJob().getProviderId()).orElse(null);
+        User provider = userRepository.findById(
+                saved.getJob().getProviderId()
+        ).orElse(null);
+
         return ApplicationResponse.fromEntity(saved, provider);
     }
+
 
     // -----------------------------------------------------------
     // SEEKER APPLIED JOB LIST (CARD VIEW)
@@ -218,19 +230,20 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             throw new RuntimeException("Unauthorized");
         }
 
-        // ⭐ IMPORTANT FIX: Only allow hide when chat room exists
-        if (app.getChatRoom() == null) {
-            throw new RuntimeException("Cannot remove — job not fully completed yet");
+        // ✅ CORRECT CONDITION
+        if (!app.getStatus().equalsIgnoreCase("both_accepted")
+                && !app.getStatus().equalsIgnoreCase("rejected")) {
+            throw new RuntimeException("Cannot remove — job not completed yet");
         }
 
         app.setHiddenFromSeeker(true);
         applicationRepository.save(app);
 
-        // If provider also removed → delete everything
         if (app.isHiddenFromProvider()) {
             cleanupApplication(app);
         }
     }
+
 
     // -----------------------------------------------------------
     // PROVIDER HIDE
@@ -246,19 +259,20 @@ public class JobApplicationServiceImpl implements JobApplicationService {
             throw new RuntimeException("Unauthorized");
         }
 
-        // ⭐ IMPORTANT FIX: Only allow hide when chat room exists
-        if (app.getChatRoom() == null) {
-            throw new RuntimeException("Cannot remove — job not fully completed yet");
+        // ✅ CORRECT CONDITION
+        if (!app.getStatus().equalsIgnoreCase("both_accepted")
+                && !app.getStatus().equalsIgnoreCase("rejected")) {
+            throw new RuntimeException("Cannot remove — job not completed yet");
         }
 
         app.setHiddenFromProvider(true);
         applicationRepository.save(app);
 
-        // If seeker also removed → delete everything
         if (app.isHiddenFromSeeker()) {
             cleanupApplication(app);
         }
     }
+
 
     // -----------------------------------------------------------
     // CLEANUP (DELETE application + cascade deletes chat)

@@ -3,9 +3,13 @@ package com.Sriram.Part_Time_jobProtal.Exception;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<String> handleConflict(ConflictException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
+    }
 
     @ExceptionHandler(AlreadyAppliedException.class)
     public ResponseEntity<String> handleAlreadyApplied(AlreadyAppliedException ex) {
@@ -22,9 +26,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(401).body(ex.getMessage());
     }
 
-    // fallback
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGlobal(Exception ex) {
-        return ResponseEntity.status(500).body("Something went wrong: " + ex.getMessage());
+        return ResponseEntity.status(500).body("Something went wrong");
     }
 }

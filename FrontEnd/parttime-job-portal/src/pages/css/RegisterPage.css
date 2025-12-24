@@ -1,138 +1,192 @@
 /* ==================================================
-   REGISTER PAGE — USING GLOBAL THEME VARIABLES
+   REGISTER PAGE — PRODUCTION READY
+   Clean • Modern • Theme Consistent
 ================================================== */
 
-/* 1. Layout */
+/* =====================
+   1. PAGE LAYOUT
+===================== */
 .register-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    /* Soft classy sky gradient */
-    background: linear-gradient(
-        to bottom right,
-        var(--background),
-        var(--primary-light)
-    );
+  background: linear-gradient(
+    to bottom right,
+    var(--background),
+    var(--primary-light)
+  );
 
-    padding: 20px;
+  padding: 20px;
 }
 
-/* 2. Card */
+/* =====================
+   2. CARD
+===================== */
 .register-card {
-    width: 100%;
-    max-width: 480px;
+  width: 100%;
+  max-width: 460px;
 
-    background: #ffffff;
-    padding: 24px;
+  background: var(--card-bg);
+  padding: 28px 26px;
 
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
 
-    box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 3. Title */
+.register-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.18);
+}
+
+/* =====================
+   3. TITLE & SUBTEXT
+===================== */
 .register-title {
-    text-align: center;
-    font-size: 1.7rem;
-    font-weight: 700;
-    color: var(--primary-dark);
-    margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 6px;
 }
 
-/* 4. Form Groups */
+.register-subtext {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 22px;
+}
+
+/* =====================
+   4. FORM GROUPS
+===================== */
 .form-group {
-    margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
 }
 
-.form-label {
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: var(--text-gray);
-    margin-bottom: 6px;
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-gray);
+  margin-bottom: 6px;
 }
 
-/* 5. Inputs — CLEAN WHITE (no blue background) */
-.form-control-base {
-    width: 100%;
-    padding: 10px 12px;
+.form-group input,
+.form-group select {
+  padding: 12px 14px;
+  font-size: 0.95rem;
 
-    background: white;
-    border: 1px solid var(--secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: var(--text-dark);
 
-    border-radius: var(--radius-md);
-    font-size: 1rem;
-    color: var(--text-dark);
-
-    transition: 0.25s ease;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* On Focus */
-.form-control-base:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
-    outline: none;
+.form-group input::placeholder {
+  color: var(--text-light);
 }
 
-/* Select Dropdown */
-.form-control-base select {
-    background-color: white;
+.form-group input:hover,
+.form-group select:hover {
+  border-color: var(--primary);
 }
 
-/* 6. Register Button */
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+/* =====================
+   5. PASSWORD TOGGLE
+===================== */
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: none;
+  border: none;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+ margin-top: 13px;  
+ margin-right: 13px;
+  cursor: pointer;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-dark);
+}
+
+/* =====================
+   6. REGISTER BUTTON
+===================== */
 .register-btn-full {
-    width: 100%;
-    margin-top: 18px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
 
-    padding: 12px;
-    background: var(--primary);
-    color: #fff;
+  background: var(--primary);
+  color: #ffffff;
 
-    border-radius: var(--radius-md);
-    border: none;
+  border: none;
+  border-radius: var(--radius-md);
 
-    font-size: 1rem;
-    font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
 
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: 0.25s ease;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .register-btn-full:hover {
-    background: var(--primary-dark);
-    transform: translateY(-3px);
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-/* 7. Footer */
+.register-btn-full:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =====================
+   7. FOOTER LINK
+===================== */
 .register-login-text {
-    margin-top: 16px;
-    text-align: center;
-    color: var(--text-gray);
-    font-size: 0.95rem;
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-gray);
 }
 
 .register-login-text a {
-    color: var(--primary);
-    font-weight: 700;
-    text-decoration: none;
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .register-login-text a:hover {
-    text-decoration: underline;
-    color: var(--primary-dark);
-}
-
-/* 8. Error Message */
-.error-message {
-    background: #ffe5e5;
-    border-left: 4px solid #dc2626;
-    color: #dc2626;
-
-    padding: 10px;
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    margin-top: 8px;
+  text-decoration: underline;
+  color: var(--primary-dark);
 }

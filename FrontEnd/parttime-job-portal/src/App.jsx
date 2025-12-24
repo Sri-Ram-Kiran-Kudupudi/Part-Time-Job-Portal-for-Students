@@ -32,6 +32,7 @@ import AdminSeekerListPage from "./pages/Admin/AdminSeekerListPage";
 import AdminProviderListPage from "./pages/Admin/AdminProviderListPage";
 import AdminApplicationRecordsPage from "./pages/Admin/AdminApplicationRecordsPage";
 
+import VerifyOtpPage from "./pages/VerifyOtpPage";
 
 
 import { AuthContext, AuthProvider } from "./context/AuthContext";
@@ -42,20 +43,24 @@ import { AuthContext, AuthProvider } from "./context/AuthContext";
 // Protected Route (UPDATED)
 // ------------------------
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user } = React.useContext(AuthContext);
+  const { user, loading } = React.useContext(AuthContext);
+
+  // ⏳ Wait until auth restored
+  if (loading) {
+    return null;
+  }
 
   if (!user.isLoggedIn || !user.token) {
     return <Navigate to="/login" replace />;
   }
 
-  // Convert stored role to lowercase
-  const role = user.role?.toLowerCase();
+  if (allowedRoles) {
+    const role = user.role?.toLowerCase();
+    const allowed = allowedRoles.map(r => r.toLowerCase());
 
-  // Convert allowedRoles to lowercase
-  const allowed = allowedRoles?.map(r => r.toLowerCase());
-
-  if (allowed && !allowed.includes(role)) {
-    return <Navigate to="/404" replace />;
+    if (!allowed.includes(role)) {
+      return <Navigate to="/404" replace />;
+    }
   }
 
   return children;
@@ -71,22 +76,17 @@ export default function App() {
         <Routes>
           {/* -------------------------
               PUBLIC ROUTES
+
           -------------------------- */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/404" element={<NotFoundPage />} />
 
           {/* -------------------------
                DEFAULT DASHBOARD
           -------------------------- */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
           <Route
             path="/dashboard"

@@ -55,39 +55,38 @@ public class AdminServiceImpl implements AdminService {
     //       DELETE SEEKER LOGIC
     // ==============================
     @Override
-    @Transactional
+    @jakarta.transaction.Transactional
     public void deleteSeeker(Long userId) {
 
-        // ❌ BLOCK ONLY IF fully accepted
-        boolean fullyAccepted =
-                applicationRepo.existsByApplicant_User_IdAndStatus(userId, "both_accepted");
+        boolean hasActive =
+                applicationRepo.existsByApplicant_User_IdAndStatusAndHiddenFromSeekerFalse(
+                        userId, "both_accepted"
+                );
 
-        if (fullyAccepted) {
-            throw new RuntimeException("Cannot delete seeker: job is fully accepted by both.");
+        if (hasActive) {
+            throw new RuntimeException("Cannot delete seeker: active accepted job exists.");
         }
 
-        try {
-            // 1️⃣ delete chat rooms
-            List<Long> roomIds = applicationRepo.findChatRoomIdsByApplicantUserId(userId);
+        Applicant applicant = applicantRepo.findByUser_Id(userId)
+                .orElseThrow(() -> new RuntimeException("Applicant not found"));
 
-            for (Long roomId : roomIds) {
-                chatMessageRepository.deleteByChatRoom_Id(roomId);
-                chatRoomRepository.deleteById(roomId);
-            }
+        // 🔥 delete chats first
+        List<Long> roomIds =
+                applicationRepo.findChatRoomIdsByApplicantUserId(userId);
 
-            // 2️⃣ delete ALL job applications for this seeker (any status allowed)
-            applicationRepo.deleteByApplicant_User_Id(userId);
-
-            // 3️⃣ delete applicant row
-            applicantRepo.deleteByUser_Id(userId);
-
-            // 4️⃣ finally delete user
-            userRepo.deleteById(userId);
-
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot delete seeker due to leftover application links.");
+        for (Long roomId : roomIds) {
+            chatMessageRepository.deleteByChatRoom_Id(roomId);
+            chatRoomRepository.deleteById(roomId);
         }
+
+        // 🔥 delete job applications
+        applicationRepo.deleteByApplicant_Id(applicant.getId());
+
+        // 🔥 delete applicant + user (cascade)
+        applicantRepo.delete(applicant);
     }
+
+
 
     // ==============================
     //     DELETE PROVIDER LOGIC
@@ -96,12 +95,18 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public void deleteProvider(Long providerId) {
 
-        boolean fullyAccepted =
-                applicationRepo.existsByJob_ProviderIdAndStatus(providerId, "both_accepted");
+        boolean hasActiveApplications =
+                applicationRepo.existsByJob_ProviderIdAndStatusAndHiddenFromProviderFalse(
+                        providerId, "both_accepted"
+                );
 
-        if (fullyAccepted) {
-            throw new RuntimeException("Cannot delete provider: job fully accepted by both.");
+        if (hasActiveApplications) {
+            throw new RuntimeException(
+                    "Cannot delete provider: active accepted job exists."
+            );
         }
+
+
 
         try {
             List<Job> jobs = jobRepo.findByProviderId(providerId);
@@ -110,9 +115,12 @@ public class AdminServiceImpl implements AdminService {
                 List<Long> roomIds = applicationRepo.findChatRoomIdsByJobId(job.getId());
 
                 for (Long roomId : roomIds) {
-                    chatMessageRepository.deleteByChatRoom_Id(roomId);
-                    chatRoomRepository.deleteById(roomId);
+                    if (roomId != null) {
+                        chatMessageRepository.deleteByChatRoom_Id(roomId);
+                        chatRoomRepository.deleteById(roomId);
+                    }
                 }
+
 
                 applicationRepo.deleteByJob_Id(job.getId());
             }
@@ -154,4 +162,5 @@ public class AdminServiceImpl implements AdminService {
                     );
                 }).toList();
     }
+
 }

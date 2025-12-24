@@ -1,30 +1,48 @@
 /* ======================================
-   🌟 SKY BLUE UI FRAMEWORK (FINAL VERSION)
-   Soft White + Modern Sky Blue Theme
-   For Whole Application
+   🌟 PART-TIME JOB PORTAL – DESIGN SYSTEM
+   Clean • Professional • Calm • Scalable
 ====================================== */
 
 /* --------------------------------------------------
-   1. GLOBAL CSS VARIABLES (THEME COLORS)
+   1. GLOBAL CSS VARIABLES (DESIGN TOKENS)
 -------------------------------------------------- */
 :root {
-  --primary: #3b82f6;            /* Sky Blue */
-  --primary-dark: #1d4ed8;       /* Hover Deep Blue */
-  --primary-light: #e8f3ff;      /* Lightest Blue */
-  --secondary: #c9e6ff;          /* Soft Border Blue */
-  --background: #f3f8ff;         /* App Background */
+  /* 🎨 Brand */
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --primary-light: #eff6ff;
+  /* 🔵 Button specific */
+  --btn-bg: #1e40af;          /* ✅ button background */
+  --btn-bg-hover: #1e3a8a;    /* hover */
+   --btn-text: #ffffff;
+  /* 🎯 Neutrals */
+  --background: #f8fafc;      /* page background */
+  --card-bg: #ffffff;         /* cards */
+  --border: #e5e7eb;          /* borders */
 
-  --text-dark: #1e293b;          /* Deep Navy Blue */
-  --text-gray: #475569;          /* Blue-Gray */
-  --text-light: #64748b;
+  /* 🖋 Text */
+  --text-dark: #111827;       /* headings */
+  --text-gray: #374151;       /* body */
+  --text-light: #6b7280;      /* muted */
 
+  /* 🟢 Status */
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
+
+  --warning: #f59e0b;
+  --warning-bg: #fef3c7;
+
+  /* 📐 Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-lg: 14px;
 
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
-  --shadow-md: 0 8px 20px rgba(0,0,0,0.12);
-  --shadow-lg: 0 14px 32px rgba(59,130,246,0.25);
+  /* 🌫 Shadows (SOFT) */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 14px rgba(0,0,0,0.08);
 }
 
 /* --------------------------------------------------
@@ -34,167 +52,169 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: 0.2s ease; /* smooth hover everywhere */
+}
+
+html {
+  font-size: 16px;
 }
 
 body {
-  font-family: "Inter", Arial, sans-serif;
-  background: linear-gradient(to bottom right, var(--background), #ffffff);
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  background-color: var(--background);
   color: var(--text-dark);
-  line-height: 1.5;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* --------------------------------------------------
-   3. CARD (Reusable UI Component)
+   3. CARD SYSTEM
 -------------------------------------------------- */
 .card {
-  background: white;
-  padding: 22px;
+  background: var(--card-bg);
+  padding: 20px;
   border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
 
-  border: 1px solid var(--secondary);
-  box-shadow: var(--shadow-md);
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
 }
 
 /* --------------------------------------------------
    4. BUTTON SYSTEM
 -------------------------------------------------- */
 .btn {
-  padding: 12px 18px;
-  font-size: 1rem;
+  padding: 10px 16px;
+  font-size: 0.95rem;
   font-weight: 600;
-
   border-radius: var(--radius-md);
   border: none;
-
   cursor: pointer;
-  transition: 0.25s ease;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Primary Button */
 .btn-primary {
   background: var(--primary);
-  color: white;
+  color: #ffffff;
 }
 
 .btn-primary:hover {
   background: var(--primary-dark);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-3px);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.35);
 }
 
 /* Outline Button */
 .btn-outline-primary {
   background: transparent;
-  border: 2px solid var(--primary);
+  border: 1.5px solid var(--primary);
   color: var(--primary);
 }
 
 .btn-outline-primary:hover {
   background: var(--primary);
-  color: white;
+  color: #ffffff;
 }
 
-/* Utility Buttons */
+/* Status Buttons */
 .btn-danger {
-  background: #ef4444;
-  color: white;
+  background: var(--danger);
+  color: #ffffff;
 }
 
 .btn-success {
-  background: #10b981;
-  color: white;
+  background: var(--success);
+  color: #ffffff;
 }
 
 /* --------------------------------------------------
-   5. FORM SYSTEM (Inputs, Selects)
+   5. FORM SYSTEM
 -------------------------------------------------- */
-.form-control,
-.form-control-base {
+.form-control {
   width: 100%;
-  padding: 12px 14px;
-
+  padding: 11px 14px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--secondary);
-  background: white;
-
-  font-size: 1rem;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  font-size: 0.95rem;
   color: var(--text-dark);
-
-  transition: 0.25s ease;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
-.form-control:hover,
-.form-control-base:hover {
+.form-control:hover {
   border-color: var(--primary);
 }
 
-.form-control:focus,
-.form-control-base:focus {
+.form-control:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
   outline: none;
 }
 
-/* Labels */
 .form-label {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--text-gray);
   margin-bottom: 6px;
 }
 
 /* --------------------------------------------------
-   6. PASSWORD INPUT (EYE BUTTON)
+   6. STATUS BADGES
 -------------------------------------------------- */
-.input-group {
-  position: relative;
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
 }
 
-.input-group button {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+.badge-success {
+  background: var(--success-bg);
+  color: var(--success);
+}
 
-  border: none;
-  background: none;
-  color: var(--primary-dark);
+.badge-warning {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
 
-  font-weight: 600;
-  cursor: pointer;
+.badge-danger {
+  background: var(--danger-bg);
+  color: var(--danger);
 }
 
 /* --------------------------------------------------
-   7. ERROR + SUCCESS MESSAGES
+   7. ERROR MESSAGE
 -------------------------------------------------- */
-.form-error,
 .error-message {
-  background: #ffe5e5;
-  border-left: 4px solid #dc2626;
-  color: #dc2626;
+  background: var(--danger-bg);
+  border-left: 4px solid var(--danger);
+  color: var(--danger);
   padding: 10px;
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   margin-top: 8px;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* --------------------------------------------------
    8. LINKS
 -------------------------------------------------- */
 a {
-  color: var(--primary-dark);
+  color: var(--primary);
   font-weight: 600;
   text-decoration: none;
 }
@@ -210,13 +230,14 @@ a:hover {
 .text-muted { color: var(--text-light); }
 
 .w-full { width: 100%; }
-.max-w-sm { max-width: 400px; }
-.max-w-md { max-width: 500px; }
-.max-w-lg { max-width: 700px; }
 
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
-.flex-center { display: flex; justify-content: center; align-items: center; }
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 /* Spacing */
 .mt-1 { margin-top: 4px; }
@@ -226,13 +247,8 @@ a:hover {
 .mb-3 { margin-bottom: 12px; }
 .mb-4 { margin-bottom: 16px; }
 
-/* Shadows */
-.shadow-sm { box-shadow: var(--shadow-sm); }
-.shadow-md { box-shadow: var(--shadow-md); }
-.shadow-lg { box-shadow: var(--shadow-lg); }
-
 /* --------------------------------------------------
-   10. GRID LAYOUT
+   10. GRID SYSTEM
 -------------------------------------------------- */
 .grid {
   display: grid;
@@ -247,3 +263,33 @@ a:hover {
   grid-template-columns: repeat(3, 1fr);
 }
 
+/* --------------------------------------------------
+   11. RESPONSIVE TYPOGRAPHY
+-------------------------------------------------- */
+@media (max-width: 1024px) {
+  html { font-size: 15px; }
+}
+
+@media (max-width: 768px) {
+  html { font-size: 14px; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 13.5px; }
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+* {
+  scrollbar-width: none;          /* hide scrollbar */
+  -ms-overflow-style: none;       /* IE / Edge legacy */
+}
+
+/* Chrome, Edge, Safari */
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  display: none;
+}

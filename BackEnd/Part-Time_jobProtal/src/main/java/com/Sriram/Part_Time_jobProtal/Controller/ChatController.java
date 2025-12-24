@@ -3,18 +3,16 @@ package com.Sriram.Part_Time_jobProtal.Controller;
 import com.Sriram.Part_Time_jobProtal.Config.CustomUserDetails;
 import com.Sriram.Part_Time_jobProtal.Model.ChatMessage;
 import com.Sriram.Part_Time_jobProtal.Model.ChatRoom;
-import com.Sriram.Part_Time_jobProtal.Model.JobApplication;
-import com.Sriram.Part_Time_jobProtal.Model.User;
 import com.Sriram.Part_Time_jobProtal.Repository.ChatRoomRepository;
-import com.Sriram.Part_Time_jobProtal.Repository.UserRepository;
+import com.Sriram.Part_Time_jobProtal.Repository.JobApplicationRepository;
 import com.Sriram.Part_Time_jobProtal.Service.ChatService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -26,28 +24,44 @@ public class ChatController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomRepository chatRoomRepository;
+    private final JobApplicationRepository jobApplicationRepository;
     private final ChatService chatService;
-    private final UserRepository userRepository;
 
     // ---------------------------------------------------------
-    // 1️⃣ SEND MESSAGE (WEBSOCKET)
+    // 1️⃣ SEND MESSAGE (WEBSOCKET) — FINAL & SAFE
     // ---------------------------------------------------------
     @MessageMapping("/chat/{roomId}")
     public void receiveMessage(
             @DestinationVariable Long roomId,
-            @Payload ChatMessage incoming
+            @Payload ChatMessage incoming,
+            Principal principal
     ) {
+        if (principal == null) return;
+
+        Long userId = Long.valueOf(principal.getName());
+
+        incoming.setSenderId(userId);
         incoming.setSentAt(LocalDateTime.now());
+        incoming.setRead(false);
 
         ChatRoom room = chatRoomRepository.findById(roomId).orElse(null);
+        if (room == null) return;
 
-        if (room != null) {
-            incoming.setChatRoom(room);
-            ChatMessage saved = chatService.saveMessage(incoming);
+        Long seekerId = jobApplicationRepository.findSeekerIdByRoomId(roomId);
+        Long providerId = jobApplicationRepository.findProviderIdByRoomId(roomId);
 
-            messagingTemplate.convertAndSend("/topic/chat/" + roomId, saved);
-        }
+        incoming.setReceiverId(
+                userId.equals(seekerId) ? providerId : seekerId
+        );
+
+        incoming.setChatRoom(room);
+
+        ChatMessage saved = chatService.saveMessage(incoming);
+
+        messagingTemplate.convertAndSend("/topic/chat/" + roomId, saved);
     }
+
+
 
     // ---------------------------------------------------------
     // 2️⃣ FETCH CHAT HISTORY
@@ -58,57 +72,45 @@ public class ChatController {
     }
 
     // ---------------------------------------------------------
-    // 3️⃣ FETCH CHAT PARTNER NAME (FIXED FOR 500 ERROR)
+    // 3️⃣ FETCH CHAT PARTNER NAME
     // ---------------------------------------------------------
     @GetMapping("/{roomId}/user")
     public Map<String, String> getChatUser(
             @PathVariable Long roomId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-
         Long loggedUserId = user.getId();
 
-        ChatRoom room = chatRoomRepository.findById(roomId).orElse(null);
-        if (room == null || room.getJobApplication() == null) {
-            return Map.of("name", "Unknown User (No App)");
-        }
+        Long seekerId = jobApplicationRepository.findSeekerIdByRoomId(roomId);
 
-        JobApplication app = room.getJobApplication();
+        String seekerName = jobApplicationRepository.findSeekerNameByRoomId(roomId);
+        String providerName = jobApplicationRepository.findProviderNameByRoomId(roomId);
 
-        // ⭐ FIX: Add robust null checks to prevent NullPointerException
-
-        User seekerUser = null;
-        if (app.getApplicant() != null) {
-            seekerUser = app.getApplicant().getUser();
-        }
-
-        if (seekerUser == null) {
-            // This indicates a data integrity issue, but we safely return a fallback
-            return Map.of("name", "Error: Seeker Data Missing");
-        }
-
-        // ---------------------------------------------------------
-
-        // ⭐ SEEKER DATA (Now safe to access)
-        Long seekerId = seekerUser.getId();
-        String seekerName = seekerUser.getFullName();
-
-        // ⭐ PROVIDER DATA
-        String providerName = "Provider";
-
-        // Also check if job is null before trying to get providerId
-        if (app.getJob() != null && app.getJob().getProviderId() != null) {
-            Long providerId = app.getJob().getProviderId();
-            User provider = userRepository.findById(providerId).orElse(null);
-            if (provider != null) {
-                providerName = provider.getFullName();
-            }
-        }
-
-        // ⭐ Determine chat partner
-        String chatPartnerName =
+        String chatPartner =
                 loggedUserId.equals(seekerId) ? providerName : seekerName;
 
-        return Map.of("name", chatPartnerName);
+        return Map.of("name", chatPartner);
+    }
+
+    // ---------------------------------------------------------
+    // 4️⃣ UNREAD COUNT
+    // ---------------------------------------------------------
+    @GetMapping("/{roomId}/unread-count")
+    public long getUnreadCount(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        return chatService.getUnreadCount(roomId, user.getId());
+    }
+
+    // ---------------------------------------------------------
+    // 5️⃣ MARK AS READ
+    // ---------------------------------------------------------
+    @PostMapping("/{roomId}/read")
+    public void markAsRead(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        chatService.markMessagesAsRead(roomId, user.getId());
     }
 }

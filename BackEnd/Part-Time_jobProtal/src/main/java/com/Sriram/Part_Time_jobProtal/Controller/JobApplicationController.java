@@ -50,7 +50,6 @@ public class JobApplicationController {
         applicationService.withdrawApplication(applicationId, userId);
         return ResponseEntity.ok("Application withdrawn successfully");
     }
-
     @PutMapping("/applications/{applicationId}/accept")
     public ResponseEntity<?> providerAccept(@PathVariable Long applicationId) {
         return ResponseEntity.ok(applicationService.providerAccept(applicationId));
@@ -71,7 +70,6 @@ public class JobApplicationController {
         applicationService.hideApplicationForSeeker(applicationId, userId);
         return ResponseEntity.ok("Application hidden for seeker");
     }
-
     // ---------- NEW: provider hides the completed application from their view ----------
     @PutMapping("/applications/{applicationId}/hide/provider")
     public ResponseEntity<?> hideForProvider(@PathVariable Long applicationId,

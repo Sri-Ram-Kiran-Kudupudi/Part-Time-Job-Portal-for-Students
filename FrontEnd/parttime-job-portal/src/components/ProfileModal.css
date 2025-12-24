@@ -100,3 +100,16 @@
   /* Updated z-index to be above the modal */
   z-index: 40000 !important; /* ADD THIS LINE */
 }
+
+.btn-logout {
+  background: #dc2626;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: #b91c1c;
+}

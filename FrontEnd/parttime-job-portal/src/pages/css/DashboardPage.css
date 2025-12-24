@@ -1,87 +1,154 @@
+/* --------------------------------------------------
+   DASHBOARD PAGE – MODERN SAAS STYLE
+-------------------------------------------------- */
 
-/* Dashboard should cover exactly one screen, no page scroll */
+.dashboard-wrapper {
+  background: var(--background);
+}
+
+/* Full screen */
 .dashboard-container {
-  height: 100vh; /* Full screen */
-  overflow: hidden; /* Prevent scrollbar ONLY on this page */
-  background: linear-gradient(to bottom right, #E7F4FF, #FFFFFF);
-
-  padding-top: 5rem; /* Space for 4rem header + 1rem extra */
+  height: 100vh;
+  padding-top: 4rem;
+  overflow: hidden;
 }
 
-/* Content scrolls INTERNALLY if needed, not the whole page */
 .dashboard-content {
-  max-width: 900px;
+  max-width: 920px;
   margin: 0 auto;
-  padding: 2rem;
-
-  height: calc(100vh - 5rem); /* Screen height - header area */
-  overflow-y: auto; /* Only this section scrolls if needed */
+  padding: 2.5rem 2rem;
+  height: calc(100vh - 4rem);
+  overflow-y: auto;
 }
 
-/* Existing design styles */
+/* ================= WELCOME SECTION ================= */
+
 .welcome-card {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 1.2rem;
-  border: 1px solid #CDE9FF;
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.12);
-  text-align: center;
-}
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    var(--card-bg),
+    var(--primary-light)
+  );
+  padding: 3rem 2.5rem;
+  border-radius: 18px;
+  border: 1px solid var(--border);
 
-.welcome-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .welcome-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
-  color: #0F172A;
+  letter-spacing: -0.02em;
+  color: var(--text-dark);
 }
 
 .welcome-sub {
+  margin-top: 0.6rem;
   font-size: 1.1rem;
-  color: #3B82F6;
+  color: var(--text-gray);
+  max-width: 520px;
 }
 
+/* Accent line */
+.welcome-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 2.5rem;
+  width: 64px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+
+/* ================= QUICK ACTIONS ================= */
+
 .quick-title {
-  margin-top: 3rem;
+  margin-top: 3.5rem;
   font-size: 1.5rem;
   font-weight: 700;
-  border-left: 4px solid #3B82F6;
-  padding-left: 0.7rem;
+  color: var(--text-dark);
+  letter-spacing: -0.01em;
 }
 
 .quick-grid {
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1.3rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.6rem;
 }
 
+/* ================= QUICK CARD ================= */
+
 .quick-button {
-  background: white;
-  padding: 1.6rem;
-  border-radius: 1rem;
-  text-align: center;
-  border: 2px solid #C7E6FF;
+  background: var(--card-bg);
+  padding: 1.75rem 1.6rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
   text-decoration: none;
-  transition: 0.25s ease-in-out;
+
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.05);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .quick-button:hover {
-  background: #E7F4FF;
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow:
+    0 14px 28px rgba(37, 99, 235, 0.15);
+  border-color: var(--primary);
 }
 
+/* Icon container */
 .quick-icon {
-  font-size: 2rem;
-  color: #3B82F6;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.4rem;
 }
 
+/* Label */
 .quick-label {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 600;
+  color: var(--text-dark);
 }
 
+/* ================= MOBILE ================= */
 
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 1.8rem 1.4rem;
+  }
+
+  .welcome-title {
+    font-size: 1.8rem;
+  }
+
+  .welcome-sub {
+    font-size: 1rem;
+  }
+
+  .quick-grid {
+    grid-template-columns: 1fr;
+  }
+}

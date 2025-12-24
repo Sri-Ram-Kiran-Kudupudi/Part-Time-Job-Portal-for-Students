@@ -1,12 +1,14 @@
 // src/components/ProfileModal.jsx
 import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { updateUser, updateApplicant, getApplicantById } from "../service/api";
 import { toast } from "react-toastify";
 import "./ProfileModal.css";
 
 const ProfileModal = ({ onClose }) => {
-  const { user, updateUserState } = useContext(AuthContext);
+  const { user, updateUserState, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     fullName: "",
@@ -49,7 +51,7 @@ const ProfileModal = ({ onClose }) => {
             phone: user.phone,
           }));
         }
-      } catch (err) {
+      } catch {
         toast.error("Failed to load profile information");
       } finally {
         if (mounted) setLoading(false);
@@ -63,6 +65,9 @@ const ProfileModal = ({ onClose }) => {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  // -----------------------------
+  // SAVE PROFILE
+  // -----------------------------
   const saveChanges = async () => {
     try {
       await updateUser(user.id, {
@@ -84,7 +89,6 @@ const ProfileModal = ({ onClose }) => {
         });
       }
 
-      // ⭐ FIX — update AuthContext so UI refreshes instantly
       updateUserState({
         fullName: form.fullName,
         phone: form.phone,
@@ -92,9 +96,18 @@ const ProfileModal = ({ onClose }) => {
 
       toast.success("Profile updated successfully!");
       onClose();
-    } catch (err) {
+    } catch {
       toast.error("Failed to update profile");
     }
+  };
+
+  // -----------------------------
+  // LOGOUT (PROFESSIONAL)
+  // -----------------------------
+  const handleLogout = () => {
+    logout();           // clear auth
+    onClose();          // close modal
+    navigate("/login"); // redirect
   };
 
   if (loading)
@@ -164,7 +177,15 @@ const ProfileModal = ({ onClose }) => {
 
         <div className="modal-actions">
           <button className="btn-cancel" onClick={onClose}>Cancel</button>
-          <button className="btn-save" onClick={saveChanges}>Save Changes</button>
+
+          {/* ⭐ PROFESSIONAL LOGOUT */}
+          <button className="btn-logout" onClick={handleLogout}>
+            Logout
+          </button>
+
+          <button className="btn-save" onClick={saveChanges}>
+            Save Changes
+          </button>
         </div>
       </div>
     </div>

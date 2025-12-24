@@ -10,4 +10,5 @@ public interface AuthService {
     LoginResponse register(RegisterRequest request);
 
     JwtResponse login(LoginRequest request);
+    void sendOtpEmail(String email, String otp);
 }

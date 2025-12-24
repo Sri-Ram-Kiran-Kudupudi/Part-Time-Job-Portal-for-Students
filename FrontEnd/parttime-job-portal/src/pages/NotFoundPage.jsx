@@ -1,71 +1,71 @@
-// pages/NotFoundPage.js
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import Header from '../components/Header';
-import { AuthContext } from '../context/AuthContext';
-import './css/NotFoundPage.css'; // <-- NEW IMPORT
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
-const NotFoundPage = () => {
-    const { user } = useContext(AuthContext);
+const RegisterPage = () => {
+  const navigate = useNavigate();
 
-    // Determine the correct dashboard route based on role
-    const getDashboardRoute = (role) => {
-        switch (role) {
-            case 'seeker': return '/dashboard';
-            case 'provider': return '/provider/dashboard';
-            case 'admin': return '/admin/dashboard';
-            default: return '/login'; // Default to login if not logged in
-        }
-    };
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "",
+  });
 
-    const dashboardPath = getDashboardRoute(user.role);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    return (
-        <div className="not-found-page-container bg-light-gray"> {/* <-- CUSTOM CLASS + GLOBAL BG */}
-            <Header />
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-            {/* Content centered vertically and horizontally */}
-            <div className="not-found-content-wrapper"> {/* <-- CUSTOM CLASS */}
-                <div className="error-card card-shadow-2xl"> {/* <-- CUSTOM CLASS + GLOBAL SHADOW */}
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
 
-                    {/* Optional Visual */}
-                    <div className="error-icon text-primary"> {/* <-- CUSTOM CLASS + GLOBAL COLOR */}
-                        ❓
-                    </div>
+    try {
+      const res = await fetch("http://localhost:8080/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+        }),
+      });
 
-                    <h1 className="error-code text-gray-900"> {/* <-- CUSTOM CLASS + GLOBAL COLOR */}
-                        404
-                    </h1>
-                    <h2 className="error-title text-gray-900">
-                        Page Not Found
-                    </h2>
-                    <p className="error-message text-gray-600"> {/* <-- CUSTOM CLASS + GLOBAL COLOR */}
-                        The page you are looking for doesn’t exist or the URL is incorrect.
-                    </p>
+      if (!res.ok) {
+        toast.error("Email already exists");
+        return;
+      }
 
-                    <div className="action-buttons-group"> {/* <-- CUSTOM CLASS for spacing/responsiveness */}
-                        {/* Primary Button: Go to Dashboard */}
-                        {user.isLoggedIn && (
-                            <Link
-                                to={dashboardPath}
-                                className="btn-primary dashboard-btn" // <-- GLOBAL BUTTON CLASS + CUSTOM WIDTH
-                            >
-                                Go to Dashboard
-                            </Link>
-                        )}
+      toast.success("OTP sent to email");
+      navigate("/verify-otp", { state: { email: formData.email } });
 
-                        {/* Secondary Text Link: Back to Home */}
-                        <Link
-                            to={user.isLoggedIn ? dashboardPath : '/login'}
-                            className="link-secondary home-link" // <-- CUSTOM CLASS
-                        >
-                            Back to Home
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+    } catch {
+      toast.error("Registration failed");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="fullName" placeholder="Full Name" onChange={handleChange} required />
+      <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+      <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+      <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} required />
+
+      <select name="role" onChange={handleChange} required>
+        <option value="">Select Role</option>
+        <option value="SEEKER">Job Seeker</option>
+        <option value="PROVIDER">Job Provider</option>
+      </select>
+
+      <button type="submit">Register</button>
+    </form>
+  );
 };
 
-export default NotFoundPage;
+export default RegisterPage;

@@ -7,7 +7,4 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    @Modifying
-    @Transactional
-    void deleteById(Long id);
 }

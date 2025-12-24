@@ -81,5 +81,15 @@ export const providerHideApplication = (id) =>
 export const seekerHideApplication = (id) =>
   API.put(`/api/jobs/applications/${id}/hide/seeker`);
 
+// OTP
+export const resendOtp = (email) =>
+  API.post("/api/auth/resend-otp", { email });
+
+export const getUnreadCount = (roomId) =>
+  API.get(`/api/chat/${roomId}/unread-count`);
+
+export const markChatAsRead = (roomId) =>
+  API.post(`/api/chat/${roomId}/read`);
+
 
 export default API;

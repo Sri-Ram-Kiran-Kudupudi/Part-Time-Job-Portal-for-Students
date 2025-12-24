@@ -15,11 +15,9 @@
 
     --content-max-width: 800px;
     --padding-base: 1rem;
-    /* New variable for minimum side padding (used to achieve edge-to-edge look) */
     --page-side-padding: 1rem; 
 
     --header-height: 64px;
-    /* Input bar content height + desired bottom spacing (20px) */
     --input-bar-total-height: 90px; 
     --input-bar-padding-bottom: 20px;
 }
@@ -32,7 +30,7 @@
     background: #e6efff; 
 }
 
-/* MAIN SECTION (The centered chat window) */
+/* MAIN SECTION */
 .chat-main-area {
     flex-grow: 1;
     display: flex;
@@ -48,7 +46,6 @@
 .messages-area {
     flex-grow: 1;
     overflow-y: auto;
-    /* Adjusted side padding to account for the new header/input bar alignment */
     padding: var(--padding-base); 
     padding-top: calc(var(--header-height) + 1rem);
     padding-bottom: var(--input-bar-total-height); 
@@ -57,9 +54,7 @@
     gap: 0.5rem; 
 }
 
-/* =====================================
-    FIXED HEADER (Absolute Left Back Button)
-===================================== */
+/* FIXED HEADER */
 .fixed-header-full {
     position: fixed;
     top: 0;
@@ -73,18 +68,15 @@
 }
 
 .chat-header-content {
-    /* Use max() to ensure at least 1rem of padding, but center the content */
     max-width: calc(var(--content-max-width) + 2 * var(--page-side-padding));
     width: 100%;
     margin: 0 auto;
     height: 100%;
     display: flex;
     align-items: center;
-    /* Adjust padding to align button to the absolute start of the centered column */
     padding: 0 var(--page-side-padding); 
 }
 
-/* 🎯 FIX 1: The back button is now at the start of the centered content area */
 .back-btn {
     background: transparent;
     border: none;
@@ -102,21 +94,16 @@
     color: #333; 
 }
 
-/* =====================================
-    FIXED INPUT BAR (Centered and Not Full-Width Background)
-===================================== */
+/* FIXED INPUT BAR CONTAINER */
 .fixed-input-bar-full {
-    /* We make this container fixed and full width to establish the absolute position */
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    /* Remove background, shadow, and border from here */
     background: transparent;
     border: none;
     box-shadow: none;
     z-index: 10;
-    /* Padding is now applied to the inner form-flex container */
     padding: 0;
 }
 
@@ -125,24 +112,49 @@
     margin: 0 auto; 
     display: flex;
     gap: 0.75rem;
-    
-    /* 🎯 FIX 2: Apply the white background, border, shadow, and required padding 
-       to the centered input container itself, achieving the non-full-width effect. */
     background: white;
     border-top: 1px solid var(--secondary);
     box-shadow: 0 -4px 10px rgba(0,0,0,0.06);
-    
-    /* Set horizontal padding for internal elements, and vertical padding for height/gap */
     padding: 0.8rem var(--page-side-padding) var(--input-bar-padding-bottom) var(--page-side-padding);
-    
-    /* Ensure the input bar sits nicely on the bottom of the page */
-    border-radius: 0; /* Keep it rectangular at the bottom */
+    border-radius: 0;
 }
 
-/* =====================================
-    CHAT MESSAGE BUBBLES
-===================================== */
+/* 🎯 NEW: INPUT & BUTTON STYLING */
+.input-form-flex input {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 25px;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+}
 
+.input-form-flex input:focus {
+    border-color: var(--primary);
+}
+
+.input-form-flex button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.input-form-flex button:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+}
+
+.input-form-flex button:disabled {
+    background-color: #cbd5e1;
+    cursor: not-allowed;
+}
+
+/* MESSAGE BUBBLES */
 .message-row {
     display: flex;
     width: 100%; 
@@ -186,4 +198,23 @@
     opacity: 0.8;
     text-align: right;
     align-self: flex-end; 
+}
+/* ===========================
+   HIDE SCROLLBAR (CHAT ONLY)
+=========================== */
+
+.messages-area {
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE & Edge */
+}
+
+.messages-area::-webkit-scrollbar {
+    width: 0px;                   /* Chrome, Safari */
+    height: 0px;
+    display: none;
+}
+@keyframes fadeIn {
+    from {
+        transform: translateY(2px);
+    }
 }

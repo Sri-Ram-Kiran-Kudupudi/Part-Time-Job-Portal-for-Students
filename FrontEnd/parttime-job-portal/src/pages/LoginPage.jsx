@@ -1,5 +1,5 @@
 // src/pages/LoginPage.jsx
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
@@ -10,8 +10,16 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login } = useContext(AuthContext);
+  const { login, user } = useContext(AuthContext); // ⭐ get user also
   const navigate = useNavigate();
+
+  // ✅ MINIMAL FIX:
+  // If user already logged in, don't show login page
+  useEffect(() => {
+    if (user?.isLoggedIn) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,7 +38,6 @@ const LoginPage = () => {
 
       const data = await res.json();
 
-      // Expect backend JwtResponse: { id, token, email, fullName, role, phone }
       const userData = {
         id: data.id,
         token: data.token,
@@ -45,7 +52,7 @@ const LoginPage = () => {
 
       toast.success("Login successful!");
 
-      // ⭐ FIX: ALL ROLES GO TO SAME DASHBOARD
+      // keep your existing behavior
       setTimeout(() => {
         navigate("/dashboard");
       }, 400);
@@ -86,7 +93,7 @@ const LoginPage = () => {
 
               <button
                 type="button"
-                className="password-toggle-btn"
+                className="password-toggle-btn1"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? "Hide" : "Show"}

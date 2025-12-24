@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -25,27 +24,44 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final AppUserDetailsService appUserDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/api/auth/")
+                || path.startsWith("/ws/")
+                || path.equals("/error");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain)
             throws ServletException, IOException {
 
         final String header = request.getHeader("Authorization");
-        String email = null;
-        String token = null;
 
-        if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7);
-            email = jwtUtil.extractEmail(token);
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
         }
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        String token = header.substring(7);
+        String email;
 
-            UserDetails userDetails = appUserDetailsService.loadUserByUsername(email);
+        try {
+            email = jwtUtil.extractEmail(token);
+        } catch (Exception e) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        if (email != null &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            UserDetails userDetails =
+                    appUserDetailsService.loadUserByUsername(email);
 
             if (jwtUtil.isValid(token, userDetails.getUsername())) {
 
-                // ⭐ SET AUTHENTICATION
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -59,7 +75,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
-                // ⭐⭐ SET USER ID INTO REQUEST ATTRIBUTE (REQUIRED FOR APPLY JOB)
+                // ⭐ Attach userId
                 Long userId = jwtUtil.extractUserId(token);
                 request.setAttribute("userId", userId);
             }

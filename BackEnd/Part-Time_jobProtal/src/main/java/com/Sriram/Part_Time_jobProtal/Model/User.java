@@ -29,4 +29,8 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+    // ⭐ ADD THIS
+    private boolean enabled;
+
 }
+//But deleting User directly will FAIL if Applicant exists

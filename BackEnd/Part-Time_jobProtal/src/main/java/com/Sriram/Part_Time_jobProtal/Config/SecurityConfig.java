@@ -22,7 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import org.springframework.web.cors.*;
-
+import org.springframework.http.HttpMethod;
 import java.util.List;
 
 @Configuration
@@ -43,13 +43,19 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // PUBLIC ROUTES
+                        // ⭐⭐ VERY IMPORTANT — CORS PREFLIGHT
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // PUBLIC AUTH ROUTES
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/register",
+                                "/api/auth/verify-otp",
+                                "/api/auth/resend-otp",
                                 "/404",
                                 "/error",
-                                "/ws/**"
+                                "/ws/**",
+                                "/api/test/mail"
                         ).permitAll()
 
                         // PUBLIC — Only job listing
