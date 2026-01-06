@@ -6,11 +6,10 @@ import "./JobCard.css";
 const JobCard = ({ job }) => {
   if (!job) return null;
 
-  const { id, title, city, district, state, salary, timing, type } = job;
 
-  const location = city
-    ? `${city}${district ? ", " + district : ""}${state ? ", " + state : ""}`
-    : "No location";
+   const { id, title, address, salary, timing, type } = job;
+
+const location = address || "No location";
 
   const formatSalary = (value) => {
     if (!value) return "Not specified";
@@ -21,11 +20,11 @@ const JobCard = ({ job }) => {
   return (
     <Link to={`/job/${id}`} className="job-card-link">
       <div className="job-card">
-
+        
         <h3 className="job-title">{title || "Untitled Job"}</h3>
 
         <div className="job-meta-row">
-          <span className="job-location">{location}</span>
+          <span className="job-location">{location || "Location not provided"}</span>
         </div>
 
         <div className="job-details-row">
@@ -34,7 +33,7 @@ const JobCard = ({ job }) => {
         </div>
 
         <div className="job-type-row">
-          <span className="job-type-tag">{type}</span>
+          <span className="job-type-tag">{type || "General"}</span>
         </div>
 
       </div>

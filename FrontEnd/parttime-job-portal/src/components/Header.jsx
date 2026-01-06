@@ -12,8 +12,6 @@ const getNavLinks = (role) => {
         { name: "Job Seeker", to: "/jobs/find" },
         { name: "Applied Jobs", to: "/jobs/applied" },
       ];
-    case "provider":
-      return [{ name: "Job Provider", to: "/provider/dashboard" }];
     case "admin":
       return [{ name: "Admin Dashboard", to: "/admin/dashboard" }];
     default:

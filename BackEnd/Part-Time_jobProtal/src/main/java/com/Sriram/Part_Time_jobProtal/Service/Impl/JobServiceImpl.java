@@ -35,9 +35,7 @@ public class JobServiceImpl implements JobService {
                 .timing(job.getTiming())
                 .salary(job.getSalary())
                 .description(job.getDescription())
-                .city(job.getCity())
-                .district(job.getDistrict())
-                .state(job.getState())
+                .address(job.getAddress())
                 .latitude(job.getLatitude())
                 .longitude(job.getLongitude())
                 .providerId(job.getProviderId())
@@ -54,9 +52,7 @@ public class JobServiceImpl implements JobService {
                 .timing(req.getTiming())
                 .salary(req.getSalary())
                 .description(req.getDescription())
-                .city(req.getCity())
-                .district(req.getDistrict())
-                .state(req.getState())
+                .address(req.getAddress())
                 .latitude(req.getLatitude())
                 .longitude(req.getLongitude())
                 .providerId(providerId)
@@ -93,9 +89,7 @@ public class JobServiceImpl implements JobService {
         job.setTiming(req.getTiming());
         job.setSalary(req.getSalary());
         job.setDescription(req.getDescription());
-        job.setCity(req.getCity());
-        job.setDistrict(req.getDistrict());
-        job.setState(req.getState());
+        job.setAddress(req.getAddress());
         job.setLatitude(req.getLatitude());
         job.setLongitude(req.getLongitude());
 
@@ -104,6 +98,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void deleteJob(Long jobId, Long providerId) {
+
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
@@ -111,8 +106,13 @@ public class JobServiceImpl implements JobService {
             throw new UnauthorizedException("You cannot delete this job");
         }
 
+        // 1️⃣ delete applications first
+        applicationRepository.deleteByJob_Id(jobId);
+
+        // 2️⃣ delete job
         jobRepository.delete(job);
     }
+
 
     @Override
     public List<JobResponse> getAllJobs(String search, String city, String type, String salary) {
@@ -166,9 +166,7 @@ public class JobServiceImpl implements JobService {
                 .timing(job.getTiming())
                 .salary(job.getSalary())
                 .description(job.getDescription())
-                .city(job.getCity())
-                .district(job.getDistrict())
-                .state(job.getState())
+                .address(job.getAddress())
                 .applicants(applicantDTOs)
                 .build();
     }

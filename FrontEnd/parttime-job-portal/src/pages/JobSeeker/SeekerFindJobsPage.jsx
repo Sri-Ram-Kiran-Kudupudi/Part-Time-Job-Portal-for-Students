@@ -9,13 +9,12 @@ import SeekerMapPicker from "./SeekerMapPicker";
 /* ---------------- Static Data ---------------- */
 
 const jobTypes = [
-  "Full Time",
-  "Part Time",
-  "Sigle-Day",
-  "Weekend Job",
-  "Evening Job",
-  "Monthly Job",
-  "Urgent",
+ "Full Time",
+  "One-Day work",
+  "Weekend work",
+  "Evening work",
+  "Monthly work",
+  "Urgent work",
 ];
 
 const tags = [
@@ -131,6 +130,8 @@ const SearchMapPanel = ({
   filteredJobs,
 }) => {
   const navigate = useNavigate();
+  const [searching, setSearching] = useState(false);
+const [locSearching, setLocSearching] = useState(false);
 
   const searchLocation = async () => {
     if (!location?.searchText) return;
@@ -160,29 +161,70 @@ const SearchMapPanel = ({
       <div className="panel-card">
         <div className="search-input-wrapper">
           <input
-            type="text"
-            placeholder="Search jobs..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="form-control-base search-input"
-          />
-          <button className="search-btn">Search</button>
+  type="text"
+  placeholder="Search jobs..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      setSearching(true);
+      setTimeout(() => setSearching(false), 1000);
+    }
+  }}
+  className="form-control-base search-input"
+/>
+
+        <button 
+  className={`search-btn ${searching ? "loading" : ""}`}
+  disabled={searching}
+  onClick={()=>{
+    setSearching(true);
+    setTimeout(()=> setSearching(false),1000);
+  }}
+>
+  {searching ? "Searching..." : "Search"}
+</button>
+
         </div>
       </div>
 
       <div className="bottom-panel-content">
         <div className="panel-card mt-3">
           <input
-            type="text"
-            placeholder="Search location..."
-            value={location.searchText}
-            onChange={(e) =>
-              setLocation((p) => ({ ...p, searchText: e.target.value }))
-            }
-          />
-          <button className="search-location-btn" onClick={searchLocation}>
-            Search
-          </button>
+  type="text"
+  placeholder="Search location..."
+  value={location.searchText}
+ onChange={(e) => {
+  const value = e.target.value;
+
+  setLocation((prev) => ({
+    ...prev,
+    searchText: value,
+    ...(value === "" && { lat: null, lng: null })  // ⭐ reset filter if empty
+  }));
+}}
+
+  onKeyDown={async (e) => {
+    if (e.key === "Enter") {
+      setLocSearching(true);
+      await searchLocation();
+      setTimeout(() => setLocSearching(false), 900);
+    }
+  }}
+/>
+
+          <button 
+  className={`search-location-btn ${locSearching ? "loading" : ""}`}
+  disabled={locSearching}
+  onClick={async ()=>{
+    setLocSearching(true);
+    await searchLocation();
+    setTimeout(()=> setLocSearching(false),900);
+  }}
+>
+  {locSearching ? "Finding..." : "Search"}
+</button>
+
         </div>
 
         <div className="panel-card mt-3">
@@ -212,7 +254,7 @@ const SearchMapPanel = ({
 
 const SeekerFindJobsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [radius, setRadius] = useState("");
+  const [radius, setRadius] = useState("5");
 
   const [location, setLocation] = useState({
     lat: null,
@@ -267,22 +309,24 @@ const SeekerFindJobsPage = () => {
       );
     }
 
-   const radiusNum = Number(radius);
+ // ⭐ Location Based Filtering Logic
+const radiusNum = Number(radius) || 5;
 
-if (radiusNum > 0 && location.lat && location.lng) {
 
-      updated = updated.filter((job) => {
-        if (!job.latitude || !job.longitude) return false;
-        return (
-          getDistanceKm(
-            location.lat,
-            location.lng,
-            job.latitude,
-            job.longitude
-          ) <= radiusNum
-        );
-      });
-    }
+if (location.lat && location.lng && radiusNum > 0) {
+  updated = updated.filter(job => {
+    if (!job.latitude || !job.longitude) return false;
+
+    return (
+      getDistanceKm(
+        location.lat,
+        location.lng,
+        job.latitude,
+        job.longitude
+      ) <= radiusNum
+    );
+  });
+}
 
     setFilteredJobs(updated);
   }, [jobs, filters.tags, radius, location]);

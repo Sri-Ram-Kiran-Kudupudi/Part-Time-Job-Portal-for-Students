@@ -4,6 +4,7 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { AuthContext } from "../../context/AuthContext";
 import { markChatAsRead } from "../../service/api";
+import { IoArrowBack } from "react-icons/io5"; // Import the back icon
 import "./ChatPage.css";
 
 const ChatPage = () => {
@@ -15,31 +16,24 @@ const ChatPage = () => {
   const [chatUserName, setChatUserName] = useState("");
   const [inputMessage, setInputMessage] = useState("");
 
-  // ✅ IMPORTANT: ref for messages container
   const messagesContainerRef = useRef(null);
   const stompClientRef = useRef(null);
 
-  // ✅ PROPER SCROLL FUNCTION (NO JUMPING)
   const scrollToBottom = () => {
     const container = messagesContainerRef.current;
     if (!container) return;
-
     container.scrollTo({
       top: container.scrollHeight,
       behavior: "smooth",
     });
   };
 
-  // ------------------ LOAD CHAT USER ------------------
   const loadChatUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(
-        `http://localhost:8080/api/chat/${chatId}/user`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`http://localhost:8080/api/chat/${chatId}/user`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) return;
       const data = await res.json();
       setChatUserName(data.name);
@@ -48,19 +42,15 @@ const ChatPage = () => {
     }
   };
 
-  // ------------------ LOAD CHAT HISTORY ------------------
   const loadChatHistory = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(
-        `http://localhost:8080/api/chat/${chatId}/messages`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch(`http://localhost:8080/api/chat/${chatId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       if (!res.ok) return;
       const data = await res.json();
       setMessages(data || []);
@@ -69,21 +59,15 @@ const ChatPage = () => {
     }
   };
 
-  // ------------------ CONNECT WEBSOCKET ------------------
   const connectWebSocket = () => {
     const token = localStorage.getItem("token");
-
     if (stompClientRef.current?.active) {
       stompClientRef.current.deactivate();
     }
-
     const socket = new SockJS("http://localhost:8080/ws");
-
     const stompClient = new Client({
       webSocketFactory: () => socket,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
+      connectHeaders: { Authorization: `Bearer ${token}` },
       debug: () => {},
       onConnect: () => {
         stompClient.subscribe(`/topic/chat/${chatId}`, (message) => {
@@ -92,31 +76,25 @@ const ChatPage = () => {
         });
       },
     });
-
     stompClient.activate();
     stompClientRef.current = stompClient;
   };
 
-  // ------------------ INITIAL LOAD ------------------
   useEffect(() => {
     loadChatUser();
     loadChatHistory();
     connectWebSocket();
-
     return () => stompClientRef.current?.deactivate();
   }, [chatId]);
 
-  // ------------------ AUTO SCROLL ON MESSAGE CHANGE ------------------
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  // ------------------ MARK AS READ ------------------
   useEffect(() => {
     markChatAsRead(chatId).catch(() => {});
   }, [chatId]);
 
-  // ------------------ SEND MESSAGE ------------------
   const handleSend = (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
@@ -139,12 +117,14 @@ const ChatPage = () => {
 
   return (
     <div className="chat-page-container">
+      {/* ---------------- NAVIGATION ---------------- */}
+      <button className="chat-back-icon-btn" onClick={() => navigate(-1)}>
+        <IoArrowBack size={22} />
+      </button>
+
       {/* ---------------- HEADER ---------------- */}
       <div className="fixed-header-full">
         <div className="chat-header-content">
-          <button className="back-btn" onClick={() => navigate(-1)}>
-            ← Back
-          </button>
           <h3 className="chat-recipient-name">
             {chatUserName || "Chat"}
           </h3>
@@ -157,33 +137,15 @@ const ChatPage = () => {
           {messages.map((msg, index) => (
             <div
               key={msg.id || index}
-              className={`message-row ${
-                isUserSender(msg.senderId)
-                  ? "justify-end"
-                  : "justify-start"
-              }`}
+              className={`message-row ${isUserSender(msg.senderId) ? "justify-end" : "justify-start"}`}
             >
-              <div
-                className={`message-bubble ${
-                  isUserSender(msg.senderId)
-                    ? "bubble-user"
-                    : "bubble-other"
-                }`}
-              >
+              <div className={`message-bubble ${isUserSender(msg.senderId) ? "bubble-user" : "bubble-other"}`}>
                 {!isUserSender(msg.senderId) && (
-                  <span className="sender-name">
-                    {chatUserName}
-                  </span>
+                  <span className="sender-name">{chatUserName}</span>
                 )}
-
                 <p>{msg.content}</p>
-
                 <span className="timestamp-text">
-                  {msg.sentAt &&
-                    new Date(msg.sentAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                  {msg.sentAt && new Date(msg.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
             </div>
@@ -200,7 +162,7 @@ const ChatPage = () => {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
           />
-          <button disabled={!inputMessage.trim()}>
+          <button disabled={!inputMessage.trim()} className="chat-send-btn">
             Send
           </button>
         </form>

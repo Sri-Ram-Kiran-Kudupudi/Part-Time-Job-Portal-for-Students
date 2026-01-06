@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import "./ApplyAgreementPage.css";
+import { IoArrowBack } from "react-icons/io5";
 
 import { getJobById, applyJob } from "../../service/api";
 import { toast } from "react-toastify";
@@ -26,19 +27,17 @@ const ApplyAgreementPage = () => {
   const [agreed, setAgreed] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
 
-  // Load job details
   useEffect(() => {
     const loadJob = async () => {
       try {
         const res = await getJobById(jobId);
+        const { address, ...jobData } = res.data;
 
-        const { city, district, state, ...jobData } = res.data;
+        setJob({
+          ...jobData,
+          location: address || "Location N/A"
+        });
 
-        const fullLocation = city
-          ? `${city}${district ? ", " + district : ""}${state ? ", " + state : ""}`
-          : "Location N/A";
-
-        setJob({ ...jobData, location: fullLocation });
       } catch (err) {
         console.error("Job load error:", err);
       }
@@ -47,93 +46,62 @@ const ApplyAgreementPage = () => {
     loadJob();
   }, [jobId]);
 
-  // Submit application
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!agreed || isApplying) return;
 
     setIsApplying(true);
 
     try {
-      // ⭐ FINAL FIX: Required field for backend
-      const payload = {
-        message: "Applicant has agreed to all terms."
-      };
-
-      await applyJob(jobId, payload);
+      await applyJob(jobId, { message: "Applicant agreed to all terms." });
 
       toast.success("Application submitted successfully!");
 
-      setTimeout(() => {
-        navigate("/jobs/applied");
-      }, 1200);
+      setTimeout(() => navigate("/jobs/applied"), 1200);
 
     } catch (error) {
       console.error("Application Error:", error);
+      const msg = error?.response?.data?.message || "Something went wrong.";
 
-      let backendMessage = "Something went wrong.";
-
-      if (error.response?.data?.message) {
-        backendMessage = error.response.data.message;
-      }
-
-      const msg = backendMessage.toLowerCase();
-
-      if (
-        msg.includes("already applied") ||
-        msg.includes("duplicate") ||
-        error.response?.status === 409
-      ) {
+      if (msg.toLowerCase().includes("already"))
         toast.error("You have already applied for this job.");
-      } else {
-        toast.error(backendMessage);
-      }
+      else toast.error(msg);
 
     } finally {
       setIsApplying(false);
     }
   };
 
-  if (loading)
-    return (
-      <div className="app-background min-h-screen">
-        <main className="agreement-page-container">
-          <p>Loading job details...</p>
-        </main>
-      </div>
-    );
+  if (loading) return (
+    <div className="app-background min-h-screen">
+      <main className="agreement-page-container">
+        <p>Loading job details...</p>
+      </main>
+    </div>
+  );
 
-  if (!job)
-    return (
-      <div className="app-background min-h-screen">
-        <main className="agreement-page-container">
-          <p>Job not found.</p>
-        </main>
-      </div>
-    );
-
-  const formatSalary = (value) =>
-    !value ? "Not specified" : value.includes("₹") ? value : `₹${value}`;
+  if (!job) return (
+    <div className="app-background min-h-screen">
+      <main className="agreement-page-container">
+        <p>Job not found.</p>
+      </main>
+    </div>
+  );
 
   return (
     <div className="app-background min-h-screen">
+
+      {/* PRODUCTION FLOATING BACK BUTTON */}
+      <button onClick={() => navigate(-1)} className="back-floating-btn">
+        <IoArrowBack size={22} color="black" />
+      </button>
+
       <main className="agreement-page-container">
-        <button onClick={() => navigate(-1)} className="btn-back-link">
-          ← Back to Job Details
-        </button>
 
-        <div className="summary-card">
-          <h1 className="text-xl font-bold text-gray-900">{job.title}</h1>
+        {/* CENTER CARD */}
+        <form onSubmit={handleSubmit} className="agreement-card card shadow-md">
 
-          <div className="flex-summary-details">
-            <span>Location: {job.location}</span>
-            <span>Pay: {formatSalary(job.salary)}</span>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="terms-card shadow-md">
-          <h2>Application Agreement & Terms</h2>
+          <h2 className="agreement-title">Application Agreement & Terms</h2>
 
           <div className="terms-scroll-area">
             <ul className="terms-list">
@@ -158,15 +126,15 @@ const ApplyAgreementPage = () => {
 
           <button
             type="submit"
-            className={`btn btn-primary apply-btn w-full ${
-              !agreed || isApplying ? "btn-disabled" : ""
-            }`}
+            className={`btn btn-primary apply-btn w-full ${!agreed || isApplying ? "btn-disabled" : ""}`}
             disabled={!agreed || isApplying}
           >
             {isApplying ? "Submitting..." : "Agree & Apply"}
           </button>
+
         </form>
       </main>
+
     </div>
   );
 };

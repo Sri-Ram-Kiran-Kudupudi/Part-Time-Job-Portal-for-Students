@@ -1,9 +1,9 @@
 // components/SeekerMapPicker.jsx
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
+import { useRef } from "react";
 // Fix leaflet default icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -15,15 +15,10 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-/* ---------------------------
-   USER LOCATION BALL - INLINE-STYLED
-   This does not depend on external CSS.
-   Change backgroundColor variable below to alter color.
-   ---------------------------*/
-const ballColor = "#ff3333"; // <- change to any hex you like
+/* ---------------- USER BALL ---------------- */
+const ballColor = "#ff3333";
 
 const pinIcon = L.divIcon({
-  // inline styles inside the html string guarantee color / visuals are applied
   html: `
     <div style="
       width: 18px;
@@ -36,14 +31,12 @@ const pinIcon = L.divIcon({
       transform: translateY(-6px);
     "></div>
   `,
-  className: "", // keep empty to avoid external CSS classes
+  className: "",
   iconSize: [24, 24],
   iconAnchor: [12, 24],
 });
 
-/* ---------------------------
-   Marker arrow images (reliable CDN)
-   ---------------------------*/
+/* ---------------- JOB MARKERS ---------------- */
 const pinImages = {
   blue: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
   green: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
@@ -71,12 +64,7 @@ function createJobMarker(job) {
   return L.divIcon({
     className: "",
     html: `
-      <div style="
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        pointer-events:auto;
-      ">
+      <div style="display:flex;flex-direction:column;align-items:center;">
         <div style="
           background:white;
           color:black;
@@ -99,19 +87,6 @@ function createJobMarker(job) {
   });
 }
 
-// Reverse geocoding
-const getAddress = async (lat, lng) => {
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-    );
-    const data = await res.json();
-    return data.display_name || "";
-  } catch {
-    return "";
-  }
-};
-
 const MapClickHandler = ({ onSelect }) => {
   useMapEvents({
     click(e) {
@@ -122,36 +97,39 @@ const MapClickHandler = ({ onSelect }) => {
 };
 
 const SeekerMapPicker = ({ location, setLocation, jobPins = [] }) => {
-  const defaultPos =
-    location?.lat && location?.lng
-      ? { lat: location.lat, lng: location.lng }
-      : { lat: 16.5449, lng: 81.5212 };
+  // ⭐ STATIC initial center only once
+  const initialCenter = { lat: 16.5449, lng: 81.5212 };
 
-  const [mapRef, setMapRef] = useState(null);
+const mapRef = useRef(null);
   const [theme, setTheme] = useState("light");
-  const [address, setAddress] = useState("");
 
   const tileLayers = {
     light: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     dark: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
   };
 
-  const updatePos = async (pos) => {
-    setLocation((prev) => ({
-      ...prev,
-      lat: pos.lat,
-      lng: pos.lng,
-    }));
+  /* ⭐ MAIN MAGIC
+     WHEN USER SEARCHES → MAP ALSO MOVES
+  */
+useEffect(() => {
+  if (!mapRef.current) return;
 
-    const addr = await getAddress(pos.lat, pos.lng);
-    setAddress(addr);
+  setTimeout(() => {
+    try {
+      mapRef.current.invalidateSize();
+    } catch {}
+  }, 200);
 
-    if (mapRef) mapRef.flyTo([pos.lat, pos.lng], 17);
-  };
+  if (!location?.lat || !location?.lng) return;
+
+  mapRef.current.flyTo([location.lat, location.lng], 15, {
+    animate: true,
+    duration: 1.2,
+  });
+}, [location?.lat, location?.lng]);
 
   return (
     <div style={{ width: "100%", position: "relative" }}>
-      {/* Toggle Theme Button */}
       <button
         className="map-theme-btn"
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
@@ -160,23 +138,31 @@ const SeekerMapPicker = ({ location, setLocation, jobPins = [] }) => {
       </button>
 
       <MapContainer
-        center={defaultPos}
+        center={initialCenter}   // ❗ FIXED CENTER
         zoom={13}
         zoomControl={false}
-        whenCreated={setMapRef}
+       whenCreated={(map) => (mapRef.current = map)}
         style={{
-          height: "260px",
+          height: "100%",
+          minHeight: "260px",
           width: "100%",
           borderRadius: "10px",
           overflow: "hidden",
         }}
       >
         <TileLayer url={tileLayers[theme]} />
-        <MapClickHandler onSelect={updatePos} />
+        <MapClickHandler
+          onSelect={(pos) =>
+            setLocation(prev => ({ ...prev, lat: pos.lat, lng: pos.lng }))
+          }
+        />
 
-        {/* USER LOCATION BALL */}
+        {/* USER MARKER */}
         {location?.lat && location?.lng && (
-          <Marker position={defaultPos} icon={pinIcon} />
+          <Marker
+            position={{ lat: location.lat, lng: location.lng }}
+            icon={pinIcon}
+          />
         )}
 
         {/* JOB MARKERS */}
@@ -203,3 +189,21 @@ const SeekerMapPicker = ({ location, setLocation, jobPins = [] }) => {
 };
 
 export default SeekerMapPicker;
+
+import { useMap } from "react-leaflet";
+
+const FlyToLocation = ({ location }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!location?.lat || !location?.lng) return;
+
+    map.flyTo([location.lat, location.lng], 15, {
+      animate: true,
+      duration: 1.2,
+    });
+
+  }, [location?.lat, location?.lng, map]);
+
+  return null;
+};

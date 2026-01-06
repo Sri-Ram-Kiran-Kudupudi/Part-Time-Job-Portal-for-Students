@@ -20,8 +20,9 @@ const ProviderJobCard = ({ job, onDelete, onEdit }) => {
                 <h3 className="job-title-h3 text-gray-900">{job.title}</h3>
 
                 <div className="job-meta-flex text-gray-600">
-                    <span>{job.type}</span>
-                    <span> {job.city}</span>
+                   <span>{job.type}</span>
+                    <span>{job.address}</span>
+
                 </div>
             </div>
 

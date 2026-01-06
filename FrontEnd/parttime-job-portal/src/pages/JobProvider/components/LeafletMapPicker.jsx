@@ -119,7 +119,7 @@ const LeafletMapPicker = ({ defaultPosition, onLocationSelect }) => {
     } catch {}
   };
 
-  // HIGH-ACCURACY My Location (100% working)
+  // HIGH-ACCURACY My Location
   const detectMyLocation = () => {
     if (!navigator.geolocation) {
       alert("Your browser does not support GPS");
@@ -159,7 +159,7 @@ const LeafletMapPicker = ({ defaultPosition, onLocationSelect }) => {
     );
   };
 
-  // Search location
+  // Search location  ✅ FIXED (Numbers)
   const handleSearch = async () => {
     if (!search.trim()) return;
     setSearching(true);
@@ -172,7 +172,7 @@ const LeafletMapPicker = ({ defaultPosition, onLocationSelect }) => {
       return;
     }
 
-    const loc = { lat: result.lat, lng: result.lon };
+    const loc = { lat: Number(result.lat), lng: Number(result.lon) };
     await updatePosition(loc);
     moveMap(loc);
 
@@ -197,7 +197,7 @@ const LeafletMapPicker = ({ defaultPosition, onLocationSelect }) => {
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={onSearchKey}
         />
-        <button type="button" onClick={handleSearch} disabled={searching}>
+        <button type="button" onClick={handleSearch} disabled={searching} style={{marginLeft:"10px"}}>
           {searching ? "..." : "Search"}
         </button>
       </div>
@@ -213,22 +213,24 @@ const LeafletMapPicker = ({ defaultPosition, onLocationSelect }) => {
 
       {/* My Location */}
       <button className="map-location-btn" type="button" onClick={detectMyLocation}>
-        📍 My Location
+         My Location
       </button>
 
       {/* Map */}
       <MapContainer
-        center={position}
-        zoom={13}
-        scrollWheelZoom
-        style={{
-          height: "320px",
-          width: "100%",
-          borderRadius: "12px",
-          marginTop: "10px",
-        }}
-        whenCreated={setMapRef}
-      >
+      center={position}
+      zoom={13}
+      scrollWheelZoom
+      zoomControl={false}   // <<< ADD THIS
+      style={{
+        height: "320px",
+        width: "100%",
+        borderRadius: "12px",
+        marginTop: "10px",
+      }}
+      whenCreated={setMapRef}
+    >
+
         <TileLayer url={tiles[theme]} />
 
         <MapClickHandler updatePos={updatePosition} />

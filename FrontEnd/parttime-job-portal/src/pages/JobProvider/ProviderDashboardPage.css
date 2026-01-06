@@ -18,13 +18,15 @@
 ---------------------------------- */
 
 .dashboard-card {
+  position: relative; /* Add this to pin the button to the card */
+  display: block;
   background: var(--card-bg);
-  max-width: 620px;              /* ✅ smaller form width */
+  max-width: 620px;
   margin: 0 auto;
-  padding: 1.4rem 1.6rem;        /* ✅ compact padding */
+  padding: 1.4rem 1.6rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);  /* ✅ use system shadow */
+  box-shadow: var(--shadow-sm);
   margin-top: -50px;
 }
 .btn-back-link {
@@ -44,8 +46,8 @@
   text-decoration: underline;
 }
 
-/* Title */
 .dashboard-card h2 {
+  padding-top: 10px; /* Add a bit of space for the absolute button above it */
   font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-dark);
@@ -245,4 +247,32 @@
 
 .map-theme-btn:hover {
   background: var(--background);    /* subtle hover */
+}
+
+
+.back-icon-btn {
+  position: absolute !important; /* Force absolute positioning */
+  top: 85px !important;
+  left: 35px !important;        /* Pin to the right side */
+ 
+  width: 42px;
+  height: 42px;
+  z-index: 99;                   /* Ensure it is above the h2 title */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important; /* Adding subtle shadow to see it better */
+  transition: all 0.2s ease;
+}
+
+.back-icon-btn:hover {
+  background: #f9fafb !important;
+  transform: scale(1.05);
 }

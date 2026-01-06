@@ -9,13 +9,11 @@ public class JobResponse {
     private Long id;
     private String title;
     private String type;
-    private String city;
     private String timing;
     private String salary;
     private String description;
-    private String district;
-    private String state;
 
+    private String address;
     private Double latitude;     // ⭐ NEW
     private Double longitude;    // ⭐ NEW
 

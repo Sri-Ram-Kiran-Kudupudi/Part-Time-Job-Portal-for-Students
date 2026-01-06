@@ -25,9 +25,7 @@ public class Job {
     @Column(length = 1000)
     private String description;
 
-    private String city;
-    private String district;
-    private String state;
+    private String address;
 
     private Double latitude;   // ⭐ NEW
     private Double longitude;  // ⭐ NEW

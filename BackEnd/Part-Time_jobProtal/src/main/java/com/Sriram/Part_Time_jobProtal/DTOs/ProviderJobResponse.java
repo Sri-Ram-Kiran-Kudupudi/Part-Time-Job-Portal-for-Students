@@ -15,9 +15,6 @@ public class ProviderJobResponse {
     private String timing;
     private String salary;
     private String description;
-    private String city;
-    private String district;
-    private String state;
-
+    private String address;
     private List<ProviderApplicantDTO> applicants;
 }

@@ -68,15 +68,26 @@
 }
 
 /* RIGHT COLUMN */
+/* RIGHT SIDEBAR (Search + Map) */
 .right-col {
-    width: 500px;
-    height: 100%;
-    padding: 12px 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+  width: 420px;        /* default good width */
+  min-width: 320px;    /* ⭐ DO NOT GO SMALLER */
+  max-width: 500px;
+
+  height: 100%;
+  padding: 14px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
+
+.search-panel-container {
+  min-width: 300px;
+}
+.map-area {
+  min-width: 300px;
+}
 
 
 .bottom-panel-content {
@@ -425,12 +436,6 @@
 ===================================== */
 @media (max-width: 768px) {
 
-  /* Stack columns vertically */
-  .main-row {
-    flex-direction: column;
-    height: auto;
-  }
-
   /* Hide left filters (use slide button) */
   .left-col {
     display: none;
@@ -634,4 +639,29 @@
   height: 24px;
 
   transform: scale(1); /* 🔥 MAKES > BIGGER */
+}
+.search-btn.loading,
+.search-location-btn.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.search-btn.loading::after,
+.search-location-btn.loading::after {
+  content: "";
+  margin-left: 6px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }

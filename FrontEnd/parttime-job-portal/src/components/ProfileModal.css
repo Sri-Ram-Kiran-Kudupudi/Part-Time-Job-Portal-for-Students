@@ -9,8 +9,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* FIX: Increased z-index to be above the Header (9999) */
-  z-index: 30000; /* ADD THIS LINE */
+
+  z-index: 60000;   /* 🔥 change from 30000 to 60000 */
+}
+
+/* Make sure modal always wins */
+.modal-overlay {
+  z-index: 999999 !important;
+}
+
+.modal-container {
+  z-index: 1000000 !important;
 }
 
 

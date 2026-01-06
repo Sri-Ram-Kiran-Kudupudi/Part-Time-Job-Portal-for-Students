@@ -186,7 +186,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
                             .title(app.getJob().getTitle())
                             .type(app.getJob().getType())
                             .salary(app.getJob().getSalary())
-                            .location(app.getJob().getCity())
+                            .location(app.getJob().getAddress())
                             .providerName(provider != null ? provider.getFullName() : "Provider")
                             .status(app.getStatus())
                             .chatId(chatId)

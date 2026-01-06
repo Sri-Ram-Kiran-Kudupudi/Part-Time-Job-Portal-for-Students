@@ -154,7 +154,7 @@ public class AdminServiceImpl implements AdminService {
                             job.getTitle(),
                             job.getType(),
                             job.getTiming(),
-                            job.getDistrict(),
+                            job.getAddress(),
                             seeker.getFullName(),
                             seeker.getEmail(),
                             seeker.getPhone(),

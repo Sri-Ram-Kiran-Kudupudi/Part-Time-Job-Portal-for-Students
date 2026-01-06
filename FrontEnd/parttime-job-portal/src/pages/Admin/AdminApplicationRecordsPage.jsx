@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getAllApplicationRecords } from '../../service/api';
 import './AdminApplicationRecordsPage.css';
+import { IoArrowBack } from "react-icons/io5";
+
 
 const getStatusBadge = (status) => {
   let colorClass = "badge-pending";
@@ -152,7 +154,13 @@ const AdminApplicationRecordsPage = () => {
       <Header title="Application Records" />
 
       <main className="records-main-content">
-        <button className="btn-back-link" onClick={() => navigate(-1)}>← Back</button>
+       <button
+          onClick={() => navigate("/admin/dashboard")}
+          className="back-floating-btn"
+        >
+          <IoArrowBack size={22} color="black" />
+        </button>
+
 
         <div className="records-card">
           <h1 className="page-title">Job Match Records</h1>

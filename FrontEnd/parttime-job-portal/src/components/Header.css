@@ -43,14 +43,18 @@
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
   font-weight: 500;
-  text-decoration: none;
-  transition: 150ms ease;
+  text-decoration: none;   /* No underline */
 }
 
-.nav-link:hover {
-  color: var(--primary-color);
-  background-color: var(--secondary-color);
+/* REMOVE color change / bg / underline on hover */
+.nav-link:hover,
+.nav-link:focus,
+.nav-link:active {
+  color: #1f2937;
+  background: transparent;
+  text-decoration: none;
 }
+
 
 .profile-container {
   position: relative;

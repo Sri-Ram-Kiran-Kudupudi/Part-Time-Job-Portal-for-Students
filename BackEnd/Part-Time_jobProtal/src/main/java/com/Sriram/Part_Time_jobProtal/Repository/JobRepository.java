@@ -14,15 +14,21 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     List<Job> findByProviderId(Long providerId);
 
     @Query("""
-        SELECT j FROM Job j
-        WHERE (:search IS NULL OR LOWER(j.title) LIKE LOWER(CONCAT('%', :search, '%')))
-        AND (:city IS NULL OR LOWER(j.city) = LOWER(:city))
-        AND (:type IS NULL OR LOWER(j.type) = LOWER(:type))
-        AND (:salary IS NULL OR CAST(REGEXP_REPLACE(j.salary,'[^0-9]','') AS int) <= CAST(:salary AS int))
-    """)
+    SELECT j FROM Job j
+    WHERE (
+        :search IS NULL 
+        OR LOWER(j.title) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(j.address) LIKE LOWER(CONCAT('%', :search, '%'))
+    )
+    AND (:location IS NULL OR LOWER(j.address) LIKE LOWER(CONCAT('%', :location, '%')))
+    AND (:type IS NULL OR LOWER(j.type) = LOWER(:type))
+    AND (:salary IS NULL OR 
+        CAST(REGEXP_REPLACE(j.salary,'[^0-9]','') AS int) 
+        <= CAST(:salary AS int))
+""")
     List<Job> filterJobs(
             @Param("search") String search,
-            @Param("city") String city,
+            @Param("location") String location,
             @Param("type") String type,
             @Param("salary") String salary
     );

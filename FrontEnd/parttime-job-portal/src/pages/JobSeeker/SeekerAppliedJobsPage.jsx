@@ -70,10 +70,10 @@ const AppliedJobCard = ({ job, onDelete, onHide }) => {
   return (
     <div className="applied-job-card">
       <div>
-        <h3>{job.title}</h3>
-        <p>Provider: {job.providerName}</p>
-        <p>{job.location}</p>
-        <p>{job.salary}</p>
+        <h3 style={{color:"#1e40af"}}>{job.title}</h3>
+        <p><strong>Provider:</strong> {job.providerName}</p>
+        <p><strong>location:</strong>  {job.location}</p>
+        <p><strong>salary:</strong>  {job.salary}</p>
       </div>
 
       <div className="status-box">
@@ -88,6 +88,7 @@ const AppliedJobCard = ({ job, onDelete, onHide }) => {
                 <span className="chat-badge">{unreadCount}</span>
               )}
             </button>
+
           )}
 
           {!canRemove && (

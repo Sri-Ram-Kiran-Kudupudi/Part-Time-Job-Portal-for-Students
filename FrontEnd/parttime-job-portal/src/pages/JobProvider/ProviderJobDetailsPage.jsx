@@ -4,6 +4,7 @@ import Header from "../../components/Header";
 import "./ProviderJobDetailsPage.css";
 import { toast } from "react-toastify";
 
+import { IoArrowBack } from "react-icons/io5";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
@@ -27,6 +28,23 @@ const ProviderJobDetailsPage = () => {
 
   const stompRef = useRef(null);
 
+  // =======================
+  // NEW STATES FOR MODAL
+  // =======================
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState(null);
+
+  const askReject = (appId) => {
+    setSelectedApplication(appId);
+    setShowRejectModal(true);
+  };
+
+  const askRemove = (appId) => {
+    setSelectedApplication(appId);
+    setShowRemoveModal(true);
+  };
+
   // -----------------------------
   // FETCH JOB DETAILS
   // -----------------------------
@@ -46,7 +64,7 @@ const ProviderJobDetailsPage = () => {
   }, [jobId]);
 
   // -----------------------------
-  // INITIAL UNREAD COUNT (REST)
+  // INITIAL UNREAD COUNT
   // -----------------------------
   useEffect(() => {
     if (!jobDetails?.applicants) return;
@@ -66,7 +84,7 @@ const ProviderJobDetailsPage = () => {
   }, [jobDetails]);
 
   // -----------------------------
-  // REALTIME UNREAD UPDATES (WS)
+  // LIVE CHAT UNREAD COUNT
   // -----------------------------
   useEffect(() => {
     if (!jobDetails?.applicants) return;
@@ -108,33 +126,36 @@ const ProviderJobDetailsPage = () => {
   }, [jobDetails]);
 
   // -----------------------------
-  // HANDLERS
+  // ACTION HANDLERS
   // -----------------------------
- const handleGoBack = () => navigate(-1);
+ const handleGoBack = () => navigate("/provider/dashboard?view=jobs");
 
-
-  const handleReject = async (applicationId) => {
+  const handleReject = async () => {
     try {
-      await providerReject(applicationId);
+      await providerReject(selectedApplication);
       toast.info("Applicant rejected");
       fetchJob();
     } catch {
       toast.error("Failed to reject applicant");
     }
+    setShowRejectModal(false);
+    setSelectedApplication(null);
   };
 
-  const handleProviderHide = async (applicationId) => {
+  const handleProviderHide = async () => {
     try {
-      await providerHideApplication(applicationId);
+      await providerHideApplication(selectedApplication);
       toast.success("Applicant removed from list");
       fetchJob();
     } catch {
       toast.error("Failed to remove applicant");
     }
+    setShowRemoveModal(false);
+    setSelectedApplication(null);
   };
 
   // -----------------------------
-  // LOADING / ERROR UI
+  // LOADING UI
   // -----------------------------
   if (loading) {
     return (
@@ -157,25 +178,17 @@ const ProviderJobDetailsPage = () => {
 
   const applicants = jobDetails.applicants || [];
 
-  // ✅ NULL-SAFE SEARCH
   const filteredApplicants = applicants.filter((a) =>
-    (a.name || "")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
+    (a.name || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // -----------------------------
-  // RENDER
-  // -----------------------------
   return (
     <div className="provider-details-page">
       <Header title="Job Posting Details" />
-
-      <main className="details-main-content">
-       <button onClick={handleGoBack} className="btn-back-link">
-        ← Back
+       <button onClick={handleGoBack} className="back-icon-btn">
+        <IoArrowBack size={26} />
       </button>
-
+      <main className="details-main-content">
 
         {/* JOB DETAILS */}
         <div className="details-card">
@@ -184,12 +197,15 @@ const ProviderJobDetailsPage = () => {
           <h1 className="job-title-h1">{jobDetails.title}</h1>
 
           <div className="job-meta-grid">
-            <p><strong>🕒 Timing:</strong> {jobDetails.timing}</p>
-            <p><strong>💵 Salary:</strong> {jobDetails.salary}</p>
-            <p className="col-span-2">
-              <strong>📍 Location:</strong>{" "}
-              {jobDetails.city}, {jobDetails.district}, {jobDetails.state}
+            <p><strong>Timing:</strong> {jobDetails.timing}</p>
+            <p><strong>Salary:</strong> {jobDetails.salary}</p>
+              <p className="col-span-2">
+              <strong>Location:</strong>{" "}
+              <strong>Location:</strong>{" "}
+                {jobDetails.address || "Not Provided"}
+
             </p>
+
           </div>
 
           <div className="description-section">
@@ -214,11 +230,7 @@ const ProviderJobDetailsPage = () => {
 
           <div className="applicants-card-list">
             {filteredApplicants.map((applicant) => (
-              <div
-                className="applicant-card-item"
-                key={applicant.applicationId}
-              >
-                {/* LEFT */}
+              <div className="applicant-card-item" key={applicant.applicationId}>
                 <div className="applicant-left">
                   <div
                     className="applicant-avatar"
@@ -249,23 +261,18 @@ const ProviderJobDetailsPage = () => {
                   </div>
                 </div>
 
-                {/* ACTIONS */}
                 <div className="applicant-actions">
                   {applicant.status === "both_accepted" && (
                     <>
                       <button
                         className="btn btn-danger remove-btn"
-                        onClick={() =>
-                          handleProviderHide(applicant.applicationId)
-                        }
-                      >
+                        onClick={() => askRemove(applicant.applicationId)}
+                       style={{marginBottom:"-8px"}} >
                         Remove
                       </button>
 
                       <button
-                        onClick={() =>
-                          navigate(`/chat/${applicant.chatId}`)
-                        }
+                        onClick={() => navigate(`/chat/${applicant.chatId}`)}
                         className="btn btn-primary chat-btn"
                       >
                         💬 Chat
@@ -281,6 +288,12 @@ const ProviderJobDetailsPage = () => {
                   {applicant.status !== "both_accepted" &&
                     applicant.status !== "rejected" && (
                       <>
+                       <button
+                          onClick={() => askReject(applicant.applicationId)}
+                          className="btn btn-danger"
+                        style={{marginBottom:"-10px"}}  >
+                          Reject
+                        </button>
                         <button
                           onClick={() =>
                             navigate(
@@ -291,15 +304,6 @@ const ProviderJobDetailsPage = () => {
                         >
                           Accept
                         </button>
-
-                        <button
-                          onClick={() =>
-                            handleReject(applicant.applicationId)
-                          }
-                          className="btn btn-danger"
-                        >
-                          Reject
-                        </button>
                       </>
                     )}
                 </div>
@@ -308,6 +312,52 @@ const ProviderJobDetailsPage = () => {
           </div>
         </div>
       </main>
+
+      {/* ================= REJECT MODAL ================= */}
+      {showRejectModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Reject Applicant?</h3>
+            <p>This action cannot be undone.</p>
+
+            <div className="modal-buttons">
+              <button className="btn btn-danger" onClick={handleReject}>
+                Yes, Reject
+              </button>
+
+              <button
+                className="btn btn-outline-primary"
+                onClick={() => setShowRejectModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= REMOVE MODAL ================= */}
+      {showRemoveModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Remove From List?</h3>
+            <p>You can still access the user later.</p>
+
+            <div className="modal-buttons">
+              <button className="btn btn-danger" onClick={handleProviderHide}>
+                Yes, Remove
+              </button>
+
+              <button
+                className="btn btn-outline-primary"
+                onClick={() => setShowRemoveModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

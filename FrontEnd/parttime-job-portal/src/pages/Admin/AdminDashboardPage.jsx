@@ -1,53 +1,60 @@
 // pages/AdminDashboardPage.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../../components/Header';
-import './AdminDashboardPage.css'; // <-- Dedicated CSS
+import { 
+  HiOutlineUsers, 
+  HiOutlineClipboardList 
+} from 'react-icons/hi';
 
-// --- Card Component (Classes Converted) ---
-const AdminCard = ({ title, icon, to }) => (
-    <Link 
-        to={to} 
-        className="admin-card card-link-effect" // Custom classes for styling/effect
-    >
-        <div className="admin-card-icon">{icon}</div>
-        <h2 className="admin-card-title text-gray-900">{title}</h2>
+import Header from '../../components/Header';
+import './AdminDashboardPage.css';
+
+const AdminCard = ({ title, icon: Icon, to }) => (
+    <Link to={to} className="admin-card">
+        <div className="admin-card-icon-wrapper">
+            <Icon className="admin-card-icon" />
+        </div>
+
+        <h2 className="admin-card-title">{title}</h2>
     </Link>
 );
 
 const AdminDashboardPage = () => {
     return (
-        <div className="admin-dashboard-page bg-light-gray">
+        <div className="admin-dashboard-page">
             <Header title="Admin Dashboard" />
-            
+
             <main className="admin-main-content">
-                
-                <h1 className="main-header-title text-gray-900 border-b text-center">
-                    Platform Management Overview
-                </h1>
-                
-                {/* 3 Large Rectangular Cards */}
-                <div className="admin-card-group-spacing">
-                    
+                <header className="admin-welcome-section">
+                    <h1 className="main-header-title">
+                       Administration Dashboard
+                    </h1>
+                    <p className="main-header-subtitle">
+                        Monitor and manage all platform entities from one central location.
+                    </p>
+                </header>
+
+                <div className="admin-card-grid">
+
                     <AdminCard 
-                        title="Job Seeker List" 
-                        icon="🧑‍💼" 
-                        to="/admin/seekers" // CORRECT LINK
+                        title="Job Seeker List"
+                        icon={HiOutlineUsers}
+                        to="/admin/seekers"
                     />
-                    
+
                     <AdminCard 
-                        title="Job Provider List" 
-                        icon="🏢" 
-                        to="/admin/providers" // CORRECT LINK
+                        title="Job Provider List"
+                        icon={HiOutlineUsers}
+                        to="/admin/providers"
                     />
-                    
+
                     <AdminCard 
-                        title="Application Records" 
-                        icon="📄" 
-                        to="/admin/records" // CORRECT LINK
+                        title="Application Records"
+                        icon={HiOutlineClipboardList}
+                        to="/admin/records"
                     />
+
                 </div>
-                
             </main>
         </div>
     );

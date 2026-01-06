@@ -4,6 +4,7 @@ import Header from "../../components/Header";
 import { toast } from "react-toastify";
 import { getAllSeekers, deleteSeeker } from "../../service/api";
 import "./AdminSeekerListPage.css";
+import { IoArrowBack } from "react-icons/io5";
 
 const AdminSeekerListPage = () => {
   const navigate = useNavigate();
@@ -59,9 +60,13 @@ const AdminSeekerListPage = () => {
       <Header title="Job Seeker List" />
 
       <main className="admin-list-main-content">
-        <button onClick={() => navigate(-1)} className="btn-back-link">
-          ← Back to Dashboard
-        </button>
+        <button
+        onClick={() => navigate("/admin/dashboard")}
+        className="back-floating-btn"
+      >
+        <IoArrowBack size={22} color="black" />
+      </button>
+
 
         <div className="admin-list-card">
           <h1 className="page-title">All Registered Job Seekers</h1>
