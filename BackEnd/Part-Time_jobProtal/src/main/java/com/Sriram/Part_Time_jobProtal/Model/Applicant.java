@@ -16,7 +16,7 @@ public class Applicant {
     private Long id;
 
     // Link to User
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true) //If Applicant deleted → linked User is also deleted
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
@@ -32,7 +32,7 @@ public class Applicant {
     private String district;
     private String state;
 
-    private String status;  // e.g., pending / seeker_accepted / both_accepted
+    private String status;  // e.g., seeker_accepted / both_accepted
 
     private String chatId;
 }

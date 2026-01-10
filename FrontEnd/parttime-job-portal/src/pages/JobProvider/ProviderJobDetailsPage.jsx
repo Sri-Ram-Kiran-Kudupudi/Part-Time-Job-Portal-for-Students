@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import "./ProviderJobDetailsPage.css";
 import { toast } from "react-toastify";
-
 import { IoArrowBack } from "react-icons/io5";
+
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
@@ -23,13 +23,12 @@ const ProviderJobDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // ⭐ unread count per chatId
+  // unread count per chatId
   const [unreadMap, setUnreadMap] = useState({});
-
   const stompRef = useRef(null);
 
   // =======================
-  // NEW STATES FOR MODAL
+  // MODALS
   // =======================
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -64,7 +63,7 @@ const ProviderJobDetailsPage = () => {
   }, [jobId]);
 
   // -----------------------------
-  // INITIAL UNREAD COUNT
+  // INITIAL UNREAD COUNTS
   // -----------------------------
   useEffect(() => {
     if (!jobDetails?.applicants) return;
@@ -84,37 +83,32 @@ const ProviderJobDetailsPage = () => {
   }, [jobDetails]);
 
   // -----------------------------
-  // LIVE CHAT UNREAD COUNT
+  // LIVE CHAT UNREAD COUNTS
   // -----------------------------
   useEffect(() => {
-    if (!jobDetails?.applicants) return;
+    if (!jobDetails?.applicants?.length) return;
 
     const token = localStorage.getItem("token");
     const socket = new SockJS("http://localhost:8080/ws");
 
     const stompClient = new Client({
       webSocketFactory: () => socket,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
+      connectHeaders: { Authorization: `Bearer ${token}` },
       debug: () => {},
       onConnect: () => {
         jobDetails.applicants.forEach((applicant) => {
           if (!applicant.chatId) return;
 
-          stompClient.subscribe(
-            `/topic/chat/${applicant.chatId}`,
-            () => {
-              getUnreadCount(applicant.chatId)
-                .then((res) => {
-                  setUnreadMap((prev) => ({
-                    ...prev,
-                    [applicant.chatId]: res.data,
-                  }));
-                })
-                .catch(() => {});
-            }
-          );
+          stompClient.subscribe(`/topic/chat/${applicant.chatId}`, () => {
+            getUnreadCount(applicant.chatId)
+              .then((res) => {
+                setUnreadMap((prev) => ({
+                  ...prev,
+                  [applicant.chatId]: res.data,
+                }));
+              })
+              .catch(() => {});
+          });
         });
       },
     });
@@ -126,9 +120,9 @@ const ProviderJobDetailsPage = () => {
   }, [jobDetails]);
 
   // -----------------------------
-  // ACTION HANDLERS
+  // ACTIONS
   // -----------------------------
- const handleGoBack = () => navigate("/provider/dashboard?view=jobs");
+  const handleGoBack = () => navigate("/provider/dashboard?view=jobs");
 
   const handleReject = async () => {
     try {
@@ -155,7 +149,7 @@ const ProviderJobDetailsPage = () => {
   };
 
   // -----------------------------
-  // LOADING UI
+  // UI CONDITIONS
   // -----------------------------
   if (loading) {
     return (
@@ -167,10 +161,7 @@ const ProviderJobDetailsPage = () => {
 
   if (!jobDetails) {
     return (
-      <div
-        className="flex-center"
-        style={{ height: "80vh", color: "red", fontSize: "1.2rem" }}
-      >
+      <div className="flex-center" style={{ height: "80vh", color: "red" }}>
         Job not found.
       </div>
     );
@@ -185,11 +176,12 @@ const ProviderJobDetailsPage = () => {
   return (
     <div className="provider-details-page">
       <Header title="Job Posting Details" />
-       <button onClick={handleGoBack} className="back-icon-btn">
+
+      <button onClick={handleGoBack} className="back-icon-btn">
         <IoArrowBack size={26} />
       </button>
-      <main className="details-main-content">
 
+      <main className="details-main-content">
         {/* JOB DETAILS */}
         <div className="details-card">
           <span className="job-tag tag-primary">{jobDetails.type}</span>
@@ -199,13 +191,9 @@ const ProviderJobDetailsPage = () => {
           <div className="job-meta-grid">
             <p><strong>Timing:</strong> {jobDetails.timing}</p>
             <p><strong>Salary:</strong> {jobDetails.salary}</p>
-              <p className="col-span-2">
-              <strong>Location:</strong>{" "}
-              <strong>Location:</strong>{" "}
-                {jobDetails.address || "Not Provided"}
-
+            <p className="col-span-2">
+              <strong>Location:</strong> {jobDetails.address || "Not Provided"}
             </p>
-
           </div>
 
           <div className="description-section">
@@ -234,9 +222,7 @@ const ProviderJobDetailsPage = () => {
                 <div className="applicant-left">
                   <div
                     className="applicant-avatar"
-                    onClick={() =>
-                      navigate(`/applicant/info/${applicant.userId}`)
-                    }
+                    onClick={() => navigate(`/applicant/info/${applicant.userId}`)}
                   >
                     {applicant.name?.charAt(0)}
                   </div>
@@ -244,13 +230,7 @@ const ProviderJobDetailsPage = () => {
                   <div className="applicant-info">
                     <h3>
                       {applicant.name}
-                      <span
-                        style={{
-                          color: "#6b7280",
-                          fontSize: "14px",
-                          marginLeft: "10px",
-                        }}
-                      >
+                      <span style={{ color: "#6b7280", fontSize: 14, marginLeft: 10 }}>
                         Age: {applicant.age}
                       </span>
                     </h3>
@@ -267,7 +247,8 @@ const ProviderJobDetailsPage = () => {
                       <button
                         className="btn btn-danger remove-btn"
                         onClick={() => askRemove(applicant.applicationId)}
-                       style={{marginBottom:"-8px"}} >
+                        style={{ marginBottom: "-8px" }}
+                      >
                         Remove
                       </button>
 
@@ -288,12 +269,14 @@ const ProviderJobDetailsPage = () => {
                   {applicant.status !== "both_accepted" &&
                     applicant.status !== "rejected" && (
                       <>
-                       <button
+                        <button
                           onClick={() => askReject(applicant.applicationId)}
                           className="btn btn-danger"
-                        style={{marginBottom:"-10px"}}  >
+                          style={{ marginBottom: "-10px" }}
+                        >
                           Reject
                         </button>
+
                         <button
                           onClick={() =>
                             navigate(

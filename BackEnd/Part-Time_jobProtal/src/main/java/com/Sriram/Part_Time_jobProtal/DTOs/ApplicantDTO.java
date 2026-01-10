@@ -25,7 +25,6 @@ public class ApplicantDTO {
     public ApplicantDTO(Applicant a) {
         this.id = a.getId();
         this.fullName = a.getUser().getFullName();
-
         this.age = a.getAge();
         this.gender = a.getGender();
         this.skills = a.getSkills();

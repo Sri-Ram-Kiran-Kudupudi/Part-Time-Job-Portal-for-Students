@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 
@@ -17,48 +17,48 @@ export const AuthProvider = ({ children }) => {
     token: null,
   });
 
-  // 🔐 Restore auth on refresh WITH EXPIRY CHECK
+  /* ===============================================================
+     RESTORE AUTH ON PAGE REFRESH
+     Validates JWT + Checks Expiry
+  ================================================================ */
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    // ❌ No token → logout
     if (!token || token === "null" || token === "undefined") {
       setLoading(false);
       return;
     }
 
     try {
-      // ✅ Decode JWT
       const decoded = jwtDecode(token);
 
-      // ⏰ Check expiration
+      // Token expired → clear session
       if (decoded.exp * 1000 < Date.now()) {
         toast.info("Session expired. Please login again.");
         localStorage.clear();
-        setLoading(false);
-        return;
+      } else {
+        // Restore user
+        setUser({
+          isLoggedIn: true,
+          id: Number(localStorage.getItem("id")),
+          username: localStorage.getItem("username"),
+          email: localStorage.getItem("email"),
+          phone: localStorage.getItem("phone"),
+          role: localStorage.getItem("role"),
+          token,
+        });
       }
-
-      // ✅ Token valid → restore user
-      setUser({
-        isLoggedIn: true,
-        id: Number(localStorage.getItem("id")),
-        username: localStorage.getItem("username"),
-        email: localStorage.getItem("email"),
-        phone: localStorage.getItem("phone"),
-        role: localStorage.getItem("role"),
-        token,
-      });
-    } catch (error) {
-      // ❌ Invalid token
-      console.error("Invalid token. Logging out...");
+    } catch {
+      // Invalid / corrupted token
       localStorage.clear();
     }
 
     setLoading(false);
   }, []);
 
-  // 🔑 Login
+  /* ===============================================================
+     LOGIN → save token + user to localStorage
+  ================================================================ */
   const login = (userData) => {
     const finalName = userData.fullName || userData.username || "";
 
@@ -80,12 +80,11 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  // 📝 Update profile info
+  /* ===============================================================
+     UPDATE PROFILE STATE (after editing profile modal)
+  ================================================================ */
   const updateUserState = (updates) => {
-    const newData = { ...updates };
-
     if (updates.fullName) {
-      newData.username = updates.fullName;
       localStorage.setItem("username", updates.fullName);
     }
 
@@ -95,11 +94,14 @@ export const AuthProvider = ({ children }) => {
 
     setUser((prev) => ({
       ...prev,
-      ...newData,
+      ...updates,
+      username: updates.fullName || prev.username,
     }));
   };
 
-  // 🚪 Logout
+  /* ===============================================================
+     LOGOUT → Clears everything
+  ================================================================ */
   const logout = () => {
     localStorage.clear();
 

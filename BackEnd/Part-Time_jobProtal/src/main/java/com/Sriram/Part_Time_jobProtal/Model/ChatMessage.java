@@ -18,11 +18,8 @@ public class ChatMessage {
 
     private Long senderId;
     private String senderName;
-
-    // ⭐ NEW
     private Long receiverId;
 
-    // ⭐ FIXED: avoid MySQL reserved keyword
     @Column(name = "is_read", nullable = false)
     private boolean read = false;
 
@@ -32,7 +29,7 @@ public class ChatMessage {
     private LocalDateTime sentAt;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//Many Messages → One ChatRoom
     @JoinColumn(name = "chat_room_id")
     @JsonIgnore
     private ChatRoom chatRoom;

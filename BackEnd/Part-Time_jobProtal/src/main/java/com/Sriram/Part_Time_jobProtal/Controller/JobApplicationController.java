@@ -17,6 +17,9 @@ public class JobApplicationController {
 
     private final JobApplicationService applicationService;
 
+
+    //This API allows a logged-in user to apply for a job using jobId + request body.
+
     @PostMapping("/{jobId}/apply")
     public ResponseEntity<ApplicationResponse> apply(
             @PathVariable Long jobId,
@@ -31,6 +34,8 @@ public class JobApplicationController {
         );
     }
 
+//    This API returns list of jobs applied by the logged-in job seeker.
+
     @GetMapping("/applied")
     public ResponseEntity<?> getAppliedJobs(HttpServletRequest req) {
         Long userId = (Long) req.getAttribute("userId");
@@ -39,6 +44,7 @@ public class JobApplicationController {
         return ResponseEntity.ok(applicationService.getAppliedJobsForSeeker(userId));
     }
 
+    //This API allows a job seeker to withdraw (cancel) their job application.
     @DeleteMapping("/applications/{applicationId}")
     public ResponseEntity<?> withdrawApplication(
             @PathVariable Long applicationId,
@@ -50,17 +56,20 @@ public class JobApplicationController {
         applicationService.withdrawApplication(applicationId, userId);
         return ResponseEntity.ok("Application withdrawn successfully");
     }
+
+//This API allows job provider to accept a job application.
     @PutMapping("/applications/{applicationId}/accept")
     public ResponseEntity<?> providerAccept(@PathVariable Long applicationId) {
         return ResponseEntity.ok(applicationService.providerAccept(applicationId));
     }
 
+//This API allows job provider to reject a job application.
     @PutMapping("/applications/{applicationId}/reject")
     public ResponseEntity<?> providerReject(@PathVariable Long applicationId) {
         return ResponseEntity.ok(applicationService.providerReject(applicationId));
     }
 
-    // ---------- NEW: seeker hides the completed application from their view ----------
+    // seeker hides the completed application from their view
     @PutMapping("/applications/{applicationId}/hide/seeker")
     public ResponseEntity<?> hideForSeeker(@PathVariable Long applicationId,
                                            HttpServletRequest request) {
@@ -70,7 +79,8 @@ public class JobApplicationController {
         applicationService.hideApplicationForSeeker(applicationId, userId);
         return ResponseEntity.ok("Application hidden for seeker");
     }
-    // ---------- NEW: provider hides the completed application from their view ----------
+
+    // This API hides completed application from job provider’s dashboard.
     @PutMapping("/applications/{applicationId}/hide/provider")
     public ResponseEntity<?> hideForProvider(@PathVariable Long applicationId,
                                              HttpServletRequest request) {

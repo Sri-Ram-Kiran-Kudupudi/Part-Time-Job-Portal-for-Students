@@ -11,8 +11,10 @@ import java.util.List;
 
 public interface JobRepository extends JpaRepository<Job, Long> {
 
-    List<Job> findByProviderId(Long providerId);
+    List<Job> findByProviderId(Long providerId); //like SELECT * FROM jobs WHERE provider_id = ?
 
+    //belwo is a JPQL(Java Persistence Query Language)  query
+    //It works on Entity names & fields, not table names.
     @Query("""
     SELECT j FROM Job j
     WHERE (
@@ -37,3 +39,82 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     @Transactional
     void deleteByProviderId(Long providerId);
 }
+
+
+/*
+JPQL = Java Persistence Query Language
+It works on Entity names & fields, not table names.
+
+Here:
+
+Job = Entity
+j = alias
+
+
+So:
+
+SELECT j FROM Job j
+
+
+Means:
+Fetch Job objects from database.
+
+🔍 Now understand each condition
+🟢 search filter
+:search IS NULL
+OR title contains search
+OR address contains search
+
+
+Meaning:
+
+If search = null → ignore filter
+
+Else match title or address
+
+This allows optional searching.
+
+🟢 location filter
+:location IS NULL
+OR address contains location
+
+
+If location is given → filter
+If not → ignore
+
+🟢 type filter
+:type IS NULL
+OR j.type = type
+
+
+Example:
+Part-time / Full-time
+
+🟢 salary filter
+(:salary IS NULL
+OR
+CAST(REGEXP_REPLACE(j.salary,'[^0-9]','') AS int)
+<= CAST(:salary AS int))
+
+
+This is cool 😎
+
+Meaning:
+
+Your salary may be stored like
+₹10,000 per month OR 10000 Rs
+
+So first REGEXP_REPLACE(j.salary,'[^0-9]','')
+removes everything except numbers
+Example:
+
+"₹10,000" → "10000"
+
+"20k salary" → "20"
+Then converts to integer using CAST
+Then checks:
+database salary <= salary user provided
+⚠️ Note:
+REGEXP_REPLACE works mainly in PostgreSQL
+If your DB is MySQL, you'll need different function.
+ */

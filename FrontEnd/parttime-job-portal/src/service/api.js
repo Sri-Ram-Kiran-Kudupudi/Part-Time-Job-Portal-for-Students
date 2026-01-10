@@ -19,11 +19,11 @@ export const loginUser = (email, password) =>
 export const registerUser = (formData) =>
   API.post("/api/auth/register", formData);
 
-// ⭐ UPDATE USER (all roles)
+//  UPDATE USER (all roles)
 export const updateUser = (id, data) =>
   API.put(`/api/user/${id}`, data);
 
-// ⭐ UPDATE APPLICANT (seeker only)
+// UPDATE APPLICANT (seeker only)
 export const updateApplicant = (id, data) =>
   API.put(`/api/applicant/${id}`, data);
 

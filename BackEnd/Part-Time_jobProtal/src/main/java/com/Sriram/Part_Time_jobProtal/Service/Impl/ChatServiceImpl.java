@@ -15,9 +15,9 @@ public class ChatServiceImpl implements ChatService {
 
     private final ChatMessageRepository messageRepository;
 
-    // ✅ KEEP ONLY THIS
+    //  KEEP ONLY THIS
     @Override
-    @Transactional
+    @Transactional //Ensures database save happens safely.
     public ChatMessage saveMessage(ChatMessage msg) {
         return messageRepository.save(msg);
     }

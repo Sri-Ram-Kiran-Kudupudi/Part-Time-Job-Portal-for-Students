@@ -15,12 +15,12 @@ public class JwtUtil {
             "ThisIsAVeryLongSecretKeyForJwtTokenWhichShouldBeAtLeast32Characters";
     private final long EXPIRATION = 1000 * 60 * 60; // 1 hour
 
-    // 🔐 Create signing key
+    //  Create signing key
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    // ✅ Generate token with email, role, userId
+    //  Generate token with email, role, userId
     public String generateToken(String email, String role, Long userId) {
         return Jwts.builder()
                 .setSubject(email)
@@ -32,24 +32,24 @@ public class JwtUtil {
                 .compact();
     }
 
-    // 📩 Extract email
+    // Extract email
     public String extractEmail(String token) {
         return extractClaims(token).getSubject();
     }
 
-    // 👤 Extract role
+    //  Extract role
     public Role extractRole(String token) {
         String fullRole = extractClaims(token).get("role").toString();
         return Role.valueOf(fullRole.replace("ROLE_", ""));
     }
 
-    // 🆔 Extract userId (needed for Apply Job)
+    //  Extract userId (needed for Apply Job)
     public Long extractUserId(String token) {
         Object idObj = extractClaims(token).get("userId");
         return Long.valueOf(idObj.toString());
     }
 
-    // 📦 Extract all claims
+    //  Extract all claims
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -58,12 +58,12 @@ public class JwtUtil {
                 .getBody();
     }
 
-    // ⏰ Check expiration
+    //  Check expiration
     public boolean isTokenExpired(String token) {
         return extractClaims(token).getExpiration().before(new Date());
     }
 
-    // ✅ Validate token
+    // Validate token
     public boolean isValid(String token, String email) {
         return email.equals(extractEmail(token)) && !isTokenExpired(token);
     }

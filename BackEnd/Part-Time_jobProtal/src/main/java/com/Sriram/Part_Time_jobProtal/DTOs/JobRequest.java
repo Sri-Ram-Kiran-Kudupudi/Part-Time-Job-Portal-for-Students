@@ -11,6 +11,6 @@ public class JobRequest {
     private String description;
 
     private String address;
-    private Double latitude;   // ⭐ NEW
-    private Double longitude;  // ⭐ NEW
+    private Double latitude;
+    private Double longitude;
 }

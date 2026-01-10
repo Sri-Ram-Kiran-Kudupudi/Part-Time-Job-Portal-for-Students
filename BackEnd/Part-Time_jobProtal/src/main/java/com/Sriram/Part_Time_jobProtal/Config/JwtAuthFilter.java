@@ -75,7 +75,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
-                // ⭐ Attach userId
+                // Attach userId
                 Long userId = jwtUtil.extractUserId(token);
                 request.setAttribute("userId", userId);
             }

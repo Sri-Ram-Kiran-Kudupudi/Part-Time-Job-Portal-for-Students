@@ -14,5 +14,5 @@ public class AppliedJobDTO {
     private String location;
     private String providerName;
     private String status;
-    private Long chatId; // <-- added
+    private Long chatId;
 }

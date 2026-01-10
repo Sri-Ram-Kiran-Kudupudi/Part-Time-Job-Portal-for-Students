@@ -6,18 +6,16 @@ import { getAllApplicationRecords } from '../../service/api';
 import './AdminApplicationRecordsPage.css';
 import { IoArrowBack } from "react-icons/io5";
 
-
-const getStatusBadge = (status) => {
+const getStatusBadge = (status = "") => {
   let colorClass = "badge-pending";
 
   if (status === "both_accepted") colorClass = "badge-accepted-green";
-  else if (status.includes("rejected") || status.includes("Not"))
+  else if (status.toLowerCase().includes("rejected") || status.includes("Not"))
     colorClass = "badge-rejected-red";
 
   return <span className={`status-badge ${colorClass}`}>{status}</span>;
 };
 
-// ⭐ Download File HTML Template
 const generateHTML = (record) => `
 <!DOCTYPE html>
 <html>
@@ -31,7 +29,6 @@ const generateHTML = (record) => `
   h1 { color:#0a63c4; }
   h2 { margin-top:20px; padding-bottom:5px; border-bottom:2px solid #e5e7eb; }
   p { margin:6px 0; font-size:15px; }
-  strong { color:#111; }
 </style>
 
 </head>
@@ -43,7 +40,6 @@ const generateHTML = (record) => `
     <p><strong>Agreement ID:</strong> ${record.id}</p>
     <p><strong>Status:</strong> ${record.status}</p>
     <p><strong>Agreement Date:</strong> ${record.agreeDate || "N/A"}</p>
-    <p><strong>Message:</strong> Both the Job Provider and Job Seeker have agreed to the terms.</p>
 
     <h2>Provider Details</h2>
     <p><strong>Name:</strong> ${record.providerName}</p>
@@ -65,7 +61,6 @@ const generateHTML = (record) => `
 </html>
 `;
 
-// ⭐  Large Popup for Preview + Download
 const PDFDownloadPopup = ({ record, onClose }) => {
   const handleDownload = () => {
     const htmlContent = generateHTML(record);
@@ -79,54 +74,47 @@ const PDFDownloadPopup = ({ record, onClose }) => {
 
     URL.revokeObjectURL(url);
     toast.success("Record downloaded!");
-
     onClose();
   };
 
   return (
     <div className="modal-overlay-large">
       <div className="modal-content-large">
-
         <button className="modal-close-btn" onClick={onClose}>×</button>
 
         <h2 className="modal-title">Job Match Record Preview</h2>
 
         <div className="preview-box">
-
           <h3 className="preview-section-title">Agreement Proof</h3>
-          <p><strong>Agreement ID:</strong> {record.id}</p>
-          <p><strong>Status:</strong> {record.status}</p>
-          <p><strong>Date:</strong> {record.agreeDate || "N/A"}</p>
-          <p><strong>Message:</strong> Provider & Seeker both accepted.</p>
+          <p><strong>Agreement ID:</strong> {record?.id}</p>
+          <p><strong>Status:</strong> {record?.status}</p>
+          <p><strong>Date:</strong> {record?.agreeDate || "N/A"}</p>
 
           <h3 className="preview-section-title">Provider Details</h3>
-          <p><strong>Name:</strong> {record.providerName}</p>
-          <p><strong>Email:</strong> {record.providerEmail}</p>
-          <p><strong>Phone:</strong> {record.providerPhone}</p>
+          <p><strong>Name:</strong> {record?.providerName}</p>
+          <p><strong>Email:</strong> {record?.providerEmail}</p>
+          <p><strong>Phone:</strong> {record?.providerPhone}</p>
 
           <h3 className="preview-section-title">Seeker Details</h3>
-          <p><strong>Name:</strong> {record.seekerName}</p>
-          <p><strong>Email:</strong> {record.seekerEmail}</p>
-          <p><strong>Phone:</strong> {record.seekerPhone}</p>
+          <p><strong>Name:</strong> {record?.seekerName}</p>
+          <p><strong>Email:</strong> {record?.seekerEmail}</p>
+          <p><strong>Phone:</strong> {record?.seekerPhone}</p>
 
           <h3 className="preview-section-title">Job Information</h3>
-          <p><strong>Job:</strong> {record.jobName}</p>
-          <p><strong>Type:</strong> {record.jobType}</p>
-          <p><strong>Timing:</strong> {record.timing}</p>
-          <p><strong>Category:</strong> {record.category}</p>
-
+          <p><strong>Job:</strong> {record?.jobName}</p>
+          <p><strong>Type:</strong> {record?.jobType}</p>
+          <p><strong>Timing:</strong> {record?.timing}</p>
+          <p><strong>Category:</strong> {record?.category}</p>
         </div>
 
         <div className="modal-btn-row">
           <button className="btn-cancel" onClick={onClose}>Cancel</button>
           <button className="btn-primary" onClick={handleDownload}>Download</button>
         </div>
-
       </div>
     </div>
   );
 };
-
 
 const AdminApplicationRecordsPage = () => {
   const navigate = useNavigate();
@@ -139,14 +127,16 @@ const AdminApplicationRecordsPage = () => {
   const loadRecords = async () => {
     try {
       const res = await getAllApplicationRecords();
-      setRecords(res.data);
-    } catch (err) {
+      setRecords(res.data || []);
+    } catch {
       toast.error("Failed to load records");
     }
   };
 
   const filtered = records.filter(r =>
-    (r.jobName + r.providerName + r.seekerName).toLowerCase().includes(query.toLowerCase())
+    ((r?.jobName || "") + (r?.providerName || "") + (r?.seekerName || ""))
+      .toLowerCase()
+      .includes(query.toLowerCase())
   );
 
   return (
@@ -154,13 +144,9 @@ const AdminApplicationRecordsPage = () => {
       <Header title="Application Records" />
 
       <main className="records-main-content">
-       <button
-          onClick={() => navigate("/admin/dashboard")}
-          className="back-floating-btn"
-        >
+        <button onClick={() => navigate("/admin/dashboard")} className="back-floating-btn">
           <IoArrowBack size={22} color="black" />
         </button>
-
 
         <div className="records-card">
           <h1 className="page-title">Job Match Records</h1>
@@ -185,21 +171,21 @@ const AdminApplicationRecordsPage = () => {
 
             <tbody>
               {filtered.map((r, i) => (
-                <tr key={r.id}>
+                <tr key={r?.id || i}>
                   <td>{i + 1}</td>
 
                   <td>
-                    <strong className="text-blue">{r.jobName}</strong> ({r.jobType})  
+                    <strong className="text-blue">{r?.jobName}</strong> ({r?.jobType})
                     <br />
-                    <small>by <span className="text-green">{r.providerName}</span></small>
+                    <small>by <span className="text-green">{r?.providerName}</span></small>
                   </td>
 
-                  <td className="text-purple">{r.seekerName}</td>
+                  <td className="text-purple">{r?.seekerName}</td>
 
-                  <td>{getStatusBadge(r.status)}</td>
+                  <td>{getStatusBadge(r?.status)}</td>
 
                   <td>
-                    {r.status === "both_accepted" && (
+                    {r?.status === "both_accepted" && (
                       <button className="btn-download" onClick={() => setSelectedRecord(r)}>
                         Download
                       </button>
@@ -208,7 +194,6 @@ const AdminApplicationRecordsPage = () => {
                 </tr>
               ))}
             </tbody>
-
           </table>
 
           {filtered.length === 0 && <p className="no-data-text">No records found.</p>}
@@ -218,7 +203,6 @@ const AdminApplicationRecordsPage = () => {
       {selectedRecord && (
         <PDFDownloadPopup record={selectedRecord} onClose={() => setSelectedRecord(null)} />
       )}
-
     </div>
   );
 };

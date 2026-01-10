@@ -30,7 +30,7 @@ const AppliedJobCard = ({ job, onDelete, onHide }) => {
 
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Initial unread count
+  /* ---------- INITIAL UNREAD COUNT ---------- */
   useEffect(() => {
     if (!job.chatId || !isBothAccepted) return;
 
@@ -39,7 +39,7 @@ const AppliedJobCard = ({ job, onDelete, onHide }) => {
       .catch(() => {});
   }, [job.chatId, isBothAccepted]);
 
-  // Realtime unread update
+  /* ---------- REALTIME UNREAD UPDATES ---------- */
   useEffect(() => {
     if (!job.chatId || !isBothAccepted) return;
 
@@ -70,14 +70,16 @@ const AppliedJobCard = ({ job, onDelete, onHide }) => {
   return (
     <div className="applied-job-card">
       <div>
-        <h3 style={{color:"#1e40af"}}>{job.title}</h3>
+        <h3 style={{ color: "#1e40af" }}>{job.title}</h3>
         <p><strong>Provider:</strong> {job.providerName}</p>
-        <p><strong>location:</strong>  {job.location}</p>
-        <p><strong>salary:</strong>  {job.salary}</p>
+        <p><strong>Location:</strong> {job.location}</p>
+        <p><strong>Salary:</strong> {job.salary}</p>
       </div>
 
       <div className="status-box">
         <div className="action-row">
+
+          {/* CHAT BUTTON */}
           {isBothAccepted && job.chatId && (
             <button
               className="btn btn-primary chat-btn"
@@ -88,23 +90,18 @@ const AppliedJobCard = ({ job, onDelete, onHide }) => {
                 <span className="chat-badge">{unreadCount}</span>
               )}
             </button>
-
           )}
 
+          {/* DELETE */}
           {!canRemove && (
-            <button
-              className="btn btn-danger"
-              onClick={() => onDelete(job)}
-            >
+            <button className="btn btn-danger" onClick={() => onDelete(job)}>
               Delete
             </button>
           )}
 
+          {/* REMOVE */}
           {canRemove && (
-            <button
-              className="btn btn-danger"
-              onClick={() => onHide(job)}
-            >
+            <button className="btn btn-danger" onClick={() => onHide(job)}>
               Remove
             </button>
           )}
@@ -122,7 +119,7 @@ const AppliedJobCard = ({ job, onDelete, onHide }) => {
    SEEKER APPLIED JOBS PAGE
 ================================ */
 const SeekerAppliedJobsPage = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate();   // ✅ FIXED BUG
 
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,6 +128,7 @@ const SeekerAppliedJobsPage = () => {
   const [showHideModal, setShowHideModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
 
+  /* ---------- LOAD APPLIED JOBS ---------- */
   const loadJobs = async () => {
     try {
       setLoading(true);
@@ -147,7 +145,7 @@ const SeekerAppliedJobsPage = () => {
     loadJobs();
   }, []);
 
-  /* ---------- ASK CONFIRMATION ---------- */
+  /* ---------- ASK CONFIRM MODALS ---------- */
   const askDelete = (job) => {
     setSelectedJob(job);
     setShowDeleteModal(true);
@@ -158,7 +156,7 @@ const SeekerAppliedJobsPage = () => {
     setShowHideModal(true);
   };
 
-  /* ---------- CONFIRM ACTIONS ---------- */
+  /* ---------- CONFIRM DELETE ---------- */
   const confirmDelete = async () => {
     try {
       await deleteApplication(selectedJob.applicationId);
@@ -171,6 +169,7 @@ const SeekerAppliedJobsPage = () => {
     setSelectedJob(null);
   };
 
+  /* ---------- CONFIRM HIDE ---------- */
   const confirmHide = async () => {
     try {
       await seekerHideApplication(selectedJob.applicationId);
@@ -187,10 +186,7 @@ const SeekerAppliedJobsPage = () => {
     <div className="applied-jobs-page">
       <Header title="Your Applied Jobs" />
 
-      <button
-        className="btn-back-link"
-        onClick={() => navigate("/jobs/find")}
-      >
+      <button className="btn-back-link" onClick={() => navigate("/jobs/find")}>
         ← Back to Find Jobs
       </button>
 
@@ -221,10 +217,7 @@ const SeekerAppliedJobsPage = () => {
             <p>This action cannot be undone.</p>
 
             <div className="modal-buttons">
-              <button
-                className="btn btn-danger"
-                onClick={confirmDelete}
-              >
+              <button className="btn btn-danger" onClick={confirmDelete}>
                 Yes, Delete
               </button>
               <button
@@ -243,13 +236,10 @@ const SeekerAppliedJobsPage = () => {
         <div className="modal-overlay">
           <div className="modal-box">
             <h3>Remove From List?</h3>
-            <p>You can still access it later if needed.</p>
+            <p>You can access it again if the provider updates status.</p>
 
             <div className="modal-buttons">
-              <button
-                className="btn btn-danger"
-                onClick={confirmHide}
-              >
+              <button className="btn btn-danger" onClick={confirmHide}>
                 Yes, Remove
               </button>
               <button

@@ -7,10 +7,11 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
+//Stores application of SEEKER to JOB.
+
 @Entity
 @Table(name = "job_application")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -28,8 +29,8 @@ public class JobApplication {
     // The seeker/applicant
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "applicant_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Applicant applicant;//If Applicant is deleted → JobApplications are auto-deleted (DB-level cascade)
+    @OnDelete(action = OnDeleteAction.CASCADE)//If Applicant is deleted → JobApplications are auto-deleted (DB-level cascade)
+    private Applicant applicant;
 
 
     @Column(name = "seeker_message", length = 2000)
@@ -43,8 +44,8 @@ public class JobApplication {
 
     // Chat room created when both accepted
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_room_id")
-    private ChatRoom chatRoom;//If JobApplication is deleted → ChatRoom is deleted
+    @JoinColumn(name = "chat_room_id")//If JobApplication is deleted → ChatRoom is deleted
+    private ChatRoom chatRoom;
 
     // Flags for per-user hide (soft remove)
     @Column(name = "hidden_from_seeker", nullable = false)
@@ -52,7 +53,16 @@ public class JobApplication {
 
     @Column(name = "hidden_from_provider", nullable = false)
     private boolean hiddenFromProvider = false;
-
-
-
 }
+
+
+
+//One Job → Many Applications
+//One Application → One Job
+//Because multiple candidates can apply to same job.
+
+
+
+//One Applicant → Many Applications
+//One Application → One Applicant
+//Because one seeker can apply to multiple jobs.

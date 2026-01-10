@@ -1,5 +1,5 @@
 // src/components/ProfileModal.jsx
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { updateUser, updateApplicant, getApplicantById } from "../service/api";
@@ -25,49 +25,46 @@ const ProfileModal = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !user.id) {
+    if (!user?.id) {
       setLoading(false);
       return;
     }
 
-    let mounted = true;
+    let ignore = false;
 
-    async function load() {
+    const loadProfile = async () => {
       try {
         setForm((prev) => ({
           ...prev,
-          fullName: user.username,
+          fullName: user.username || "",
           phone: user.phone || "",
         }));
 
         if (user.role?.toLowerCase() === "seeker") {
           const res = await getApplicantById(user.id);
-          if (!mounted) return;
+          if (ignore) return;
 
           setForm((prev) => ({
             ...prev,
             ...res.data,
-            fullName: user.username,
-            phone: user.phone,
+            fullName: user.username || "",
+            phone: user.phone || "",
           }));
         }
       } catch {
         toast.error("Failed to load profile information");
       } finally {
-        if (mounted) setLoading(false);
+        if (!ignore) setLoading(false);
       }
-    }
+    };
 
-    load();
-    return () => (mounted = false);
+    loadProfile();
+    return () => (ignore = true);
   }, [user]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // -----------------------------
-  // SAVE PROFILE
-  // -----------------------------
   const saveChanges = async () => {
     try {
       await updateUser(user.id, {
@@ -101,13 +98,10 @@ const ProfileModal = ({ onClose }) => {
     }
   };
 
-  // -----------------------------
-  // LOGOUT (PROFESSIONAL)
-  // -----------------------------
   const handleLogout = () => {
-    logout();           // clear auth
-    onClose();          // close modal
-    navigate("/login"); // redirect
+    logout();
+    onClose();
+    navigate("/login");
   };
 
   if (loading)
@@ -178,7 +172,6 @@ const ProfileModal = ({ onClose }) => {
         <div className="modal-actions">
           <button className="btn-cancel" onClick={onClose}>Cancel</button>
 
-          {/* ⭐ PROFESSIONAL LOGOUT */}
           <button className="btn-logout" onClick={handleLogout}>
             Logout
           </button>

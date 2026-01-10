@@ -43,7 +43,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // ⭐⭐ VERY IMPORTANT — CORS PREFLIGHT
+                        //  VERY IMPORTANT — CORS PREFLIGHT
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // PUBLIC AUTH ROUTES
@@ -106,7 +106,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfig() {
         CorsConfiguration c = new CorsConfiguration();
         c.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
-        c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         c.addAllowedHeader("*");
         c.setAllowCredentials(true);
 

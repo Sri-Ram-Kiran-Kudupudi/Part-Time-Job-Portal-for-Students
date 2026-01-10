@@ -28,6 +28,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+
+//This service handles authentication operations like Login, Registration,
+// OTP verification setup, and JWT token generation.
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -35,18 +39,18 @@ public class AuthServiceImpl implements AuthService {
     private static final int OTP_EXPIRY_MINUTES = 2;
 
     private final UserRepository userRepository;
-    private final ApplicantRepository applicantRepository;
+    private final ApplicantRepository applicantRepository; //Only for SEEKER role
     private final EmailOtpRepository emailOtpRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
-    private final EmailService emailService;
+    private final AuthenticationManager authenticationManager; //for Validates email + password at login
+    private final JwtUtil jwtUtil;// for generate Stores email + role + userId in token
+    private final EmailService emailService; //for sending otp
 
-    // ========================= LOGIN =========================
+    // LOGIN
     @Override
     public JwtResponse login(LoginRequest request) {
 
-        try {
+        try { //here manager automatically fetch user from db and check thier encoded pswrd with input pwd if not mathch else case run
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
@@ -75,8 +79,7 @@ public class AuthServiceImpl implements AuthService {
                 token,
                 user.getEmail(),
                 user.getFullName(),
-                user.getRole(),
-                user.getPhone()
+                user.getRole()
         );
     }
 
@@ -89,20 +92,20 @@ public class AuthServiceImpl implements AuthService {
 
         User existingUser = userRepository.findByEmail(email).orElse(null);
 
-        // 🔴 CASE 1: Email already verified
+        //  CASE 1: Email already verified
         if (existingUser != null && existingUser.isEnabled()) {
             throw new ConflictException("Email already exists");
         }
 
-        // 🔁 CASE 2: Email exists but NOT verified → clean old data
+        //  CASE 2: Email exists but NOT verified → clean old data
         if (existingUser != null) {
             emailOtpRepository.deleteByEmail(email);
             applicantRepository.deleteByUser_Id(existingUser.getId());
             userRepository.delete(existingUser);
-            userRepository.flush();
+            userRepository.flush(); //for db refresh
         }
 
-        // ✅ Create new user
+        // Create new user
         User user = User.builder()
                 .fullName(request.getFullName().trim())
                 .email(email)
@@ -113,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
 
         User savedUser = userRepository.save(user);
 
-        // ✅ Create applicant profile for SEEKER
+        //  Create applicant profile for SEEKER
         if (savedUser.getRole() == Role.SEEKER) {
             applicantRepository.save(
                     Applicant.builder()
@@ -123,11 +126,11 @@ public class AuthServiceImpl implements AuthService {
             );
         }
 
-        // ================= OTP CREATION =================
+        // OTP CREATION
         String otp = OtpUtil.generateOtp();
 
-        // 🧹 Always delete old OTP
-        emailOtpRepository.deleteByEmail(email);
+        // Always delete old OTP
+        emailOtpRepository.deleteByEmail(email); //if email not exists it simply does nothing
 
         emailOtpRepository.save(
                 EmailOtp.builder()

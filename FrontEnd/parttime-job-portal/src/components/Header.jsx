@@ -1,35 +1,39 @@
 // src/components/Header.jsx
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import ProfileModal from "./ProfileModal";
 import "./Header.css";
 
-const getNavLinks = (role) => {
-  switch ((role || "").toLowerCase()) {
-    case "seeker":
-      return [
-        { name: "Job Seeker", to: "/jobs/find" },
-        { name: "Applied Jobs", to: "/jobs/applied" },
-      ];
-    case "admin":
-      return [{ name: "Admin Dashboard", to: "/admin/dashboard" }];
-    default:
-      return [];
+const getNavLinks = (role = "") => {
+  role = role.toLowerCase();
+
+  if (role === "seeker") {
+    return [
+      { name: "Job Seeker", to: "/jobs/find" },
+      { name: "Applied Jobs", to: "/jobs/applied" },
+    ];
   }
+
+  if (role === "admin") {
+    return [{ name: "Admin Dashboard", to: "/admin/dashboard" }];
+  }
+
+  return [];
 };
 
 const Header = ({ title = "Part-Time Job Portal" }) => {
   const { user } = useContext(AuthContext);
   const [showModal, setShowModal] = useState(false);
 
-  const navLinks = user && user.isLoggedIn ? getNavLinks(user.role) : [];
+  const isLoggedIn = user?.isLoggedIn;
+  const navLinks = isLoggedIn ? getNavLinks(user.role) : [];
 
   return (
     <>
       <header className="app-header">
         <div className="header-content">
-          <Link to={user.isLoggedIn ? "/dashboard" : "/"} className="header-logo">
+          <Link to={isLoggedIn ? "/dashboard" : "/"} className="header-logo">
             {title}
           </Link>
 
@@ -41,11 +45,14 @@ const Header = ({ title = "Part-Time Job Portal" }) => {
             ))}
           </nav>
 
-          {user.isLoggedIn && (
+          {isLoggedIn && (
             <div className="profile-container">
-              <button className="profile-button" onClick={() => setShowModal(true)}>
+              <button
+                className="profile-button"
+                onClick={() => setShowModal(true)}
+              >
                 <div className="profile-avatar">
-                  {user.username ? user.username[0] : "U"}
+                  {user?.username?.[0] || "U"}
                 </div>
               </button>
             </div>

@@ -12,37 +12,58 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
 
-    List<JobApplication> findByApplicant(Applicant applicant);
-
     List<JobApplication> findByApplicantAndHiddenFromSeekerFalse(Applicant applicant);
+    //Meaning:
+    //Fetch all job applications
+    //Where applicant = given applicant
+    //AND hiddenFromSeeker = false
+    //So seekers don't see removed/hidden applications.
 
-    List<JobApplication> findByJob(Job job);
 
     List<JobApplication> findByJobAndHiddenFromProviderFalse(Job job);
+    //Meaning:
+    //Fetch applications by job
+    //Only where hiddenFromProvider = false
+    //So provider does not see deleted/hidden applications.
 
     boolean existsByApplicantAndJob(Applicant applicant, Job job);
+     //Meaning:
+     //Checks if same seeker already applied for the same job
+     //Returns true / false
+     //Used to prevent duplicate apply actions.
 
-    // ✅ Correct delete
+
+
+    //  Correct delete
     @Modifying
-    @jakarta.transaction.Transactional
+    @Transactional
     void deleteByApplicant_Id(Long applicantId);
 
     @Modifying
-    @jakarta.transaction.Transactional
-    void deleteByJob_Id(Long jobId);
+    @Transactional
+    void deleteByJob_Id(Long jobId); //Deletes all applications related to a job
 
-    // ✅ Admin safety checks
-    boolean existsByApplicant_User_IdAndStatusAndHiddenFromSeekerFalse(
-            Long userId,
-            String status
-    );
+    //  Admin safety checks
+    boolean existsByApplicant_User_IdAndStatusAndHiddenFromSeekerFalse(Long userId, String status);
+    //Meaning:
+    //Check if a seeker user has applications where:
+    //applicant.user.id = userId
+    //status = given status
+    //hiddenFromSeeker = false
+    //Returns boolean
+    //Used before deleting seeker
+    //Example use:
+    //Prevent deletion if user has "both_accepted" job.
 
+
+    //Check Active Provider Applications
     boolean existsByJob_ProviderIdAndStatusAndHiddenFromProviderFalse(
             Long providerId,
             String status
-    );
+    ); //Used before deleting provider.
 
-    // ✅ Chat cleanup helpers
+    // hese queries help delete chat rooms + messages when deleting accounts.
+
     @Query("""
         SELECT a.chatRoom.id
         FROM JobApplication a
@@ -50,6 +71,12 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
           AND a.chatRoom IS NOT NULL
     """)
     List<Long> findChatRoomIdsByApplicantUserId(@Param("userId") Long userId);
+    //Meaning:
+    // We Select chatRoom.id
+    //From JobApplication table
+    //Where applicant user matches
+    //Only if chat room exists
+    //Used when deleting seeker.
 
     @Query("""
         SELECT a.chatRoom.id
@@ -59,7 +86,9 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
     """)
     List<Long> findChatRoomIdsByJobId(@Param("jobId") Long jobId);
 
-    // ================= CHAT SUPPORT QUERIES =================
+
+
+    //CHAT SUPPORT QUERIES:Used when chat page needs details quickly.
 
     // Seeker USER ID by room
     @Query("""

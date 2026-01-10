@@ -45,7 +45,7 @@ import { AuthContext, AuthProvider } from "./context/AuthContext";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = React.useContext(AuthContext);
 
-  // ⏳ Wait until auth restored
+  //  Wait until auth restored
   if (loading) {
     return null;
   }
@@ -97,9 +97,7 @@ export default function App() {
             }
           />
 
-          {/* -------------------------
-                ⭐ PROFILE ROUTES
-          -------------------------- */}
+            {/* PROFILE ROUTES */}
 
           {/* View profile (temporarily empty) */}
           <Route

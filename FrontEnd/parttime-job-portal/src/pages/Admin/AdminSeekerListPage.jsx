@@ -17,8 +17,8 @@ const AdminSeekerListPage = () => {
   const loadSeekers = async () => {
     try {
       const res = await getAllSeekers();
-      setSeekers(res.data);
-    } catch (err) {
+      setSeekers(res?.data || []);
+    } catch {
       toast.error("Failed to load seekers");
     }
   };
@@ -33,15 +33,18 @@ const AdminSeekerListPage = () => {
   };
 
   const confirmDelete = async () => {
+    if (!selectedSeeker?.id) return;
+
     try {
       await deleteSeeker(selectedSeeker.id);
       toast.success("Seeker deleted successfully");
       setShowModal(false);
+      setSelectedSeeker(null);
       loadSeekers();
     } catch (err) {
-      const backendMessage = err.response?.data;
+      const backendMessage = err?.response?.data || "";
 
-      if (backendMessage?.includes("Cannot delete seeker")) {
+      if (typeof backendMessage === "string" && backendMessage.includes("Cannot delete seeker")) {
         toast.error("This seeker cannot be deleted because they have active or accepted job applications.");
       } else {
         toast.error("Failed to delete seeker. Try again later.");
@@ -49,10 +52,8 @@ const AdminSeekerListPage = () => {
     }
   };
 
-  const filtered = seekers.filter(
-    (s) =>
-      s.fullName.toLowerCase().includes(query.toLowerCase()) ||
-      s.email.toLowerCase().includes(query.toLowerCase())
+  const filtered = seekers.filter((s = {}) =>
+    ((s.fullName || "") + (s.email || "")).toLowerCase().includes(query.toLowerCase())
   );
 
   return (
@@ -60,13 +61,13 @@ const AdminSeekerListPage = () => {
       <Header title="Job Seeker List" />
 
       <main className="admin-list-main-content">
-        <button
-        onClick={() => navigate("/admin/dashboard")}
-        className="back-floating-btn"
-      >
-        <IoArrowBack size={22} color="black" />
-      </button>
 
+        <button
+          onClick={() => navigate("/admin/dashboard")}
+          className="back-floating-btn"
+        >
+          <IoArrowBack size={22} color="black" />
+        </button>
 
         <div className="admin-list-card">
           <h1 className="page-title">All Registered Job Seekers</h1>
@@ -94,13 +95,13 @@ const AdminSeekerListPage = () => {
 
               <tbody>
                 {filtered.map((s, index) => (
-                  <tr key={s.id}>
+                  <tr key={s?.id || index}>
                     <td>{index + 1}</td>
-                    <td className="name-cell">{s.fullName}</td>
-                    <td className="email-cell">{s.email}</td>
-                    <td>{s.age}</td>
-                    <td>{s.gender}</td>
-                    <td>{s.city}</td>
+                    <td className="name-cell">{s?.fullName || "N/A"}</td>
+                    <td className="email-cell">{s?.email || "N/A"}</td>
+                    <td>{s?.age || "-"}</td>
+                    <td>{s?.gender || "-"}</td>
+                    <td>{s?.city || "-"}</td>
 
                     <td>
                       <button
@@ -124,22 +125,26 @@ const AdminSeekerListPage = () => {
         </div>
       </main>
 
-      {showModal && (
+      {showModal && selectedSeeker && (
         <div className="delete-modal-overlay">
           <div className="delete-modal">
             <h2>Delete Confirmation</h2>
             <p>
               Are you sure you want to delete{" "}
-              <strong>{selectedSeeker.fullName}</strong>?
+              <strong>{selectedSeeker?.fullName || "this seeker"}</strong>?
             </p>
 
             <div className="modal-buttons">
               <button
                 className="btn-cancel"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedSeeker(null);
+                }}
               >
                 Cancel
               </button>
+
               <button className="btn-confirm" onClick={confirmDelete}>
                 Yes, Delete
               </button>

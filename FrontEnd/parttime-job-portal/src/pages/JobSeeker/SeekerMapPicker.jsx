@@ -1,9 +1,8 @@
 // components/SeekerMapPicker.jsx
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useRef } from "react";
 // Fix leaflet default icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -114,12 +113,16 @@ const mapRef = useRef(null);
 useEffect(() => {
   if (!mapRef.current) return;
 
-  setTimeout(() => {
+  const t = setTimeout(() => {
     try {
       mapRef.current.invalidateSize();
     } catch {}
   }, 200);
 
+  return () => clearTimeout(t);
+}, []);
+useEffect(() => {
+  if (!mapRef.current) return;
   if (!location?.lat || !location?.lng) return;
 
   mapRef.current.flyTo([location.lat, location.lng], 15, {
@@ -187,23 +190,4 @@ useEffect(() => {
     </div>
   );
 };
-
 export default SeekerMapPicker;
-
-import { useMap } from "react-leaflet";
-
-const FlyToLocation = ({ location }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!location?.lat || !location?.lng) return;
-
-    map.flyTo([location.lat, location.lng], 15, {
-      animate: true,
-      duration: 1.2,
-    });
-
-  }, [location?.lat, location?.lng, map]);
-
-  return null;
-};

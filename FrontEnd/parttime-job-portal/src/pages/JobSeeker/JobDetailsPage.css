@@ -68,10 +68,9 @@
 }
 
 .job-details-title {
-  margin: 1rem 0;
   font-size: 2rem;
   color: var(--text-dark);
-  margin-bottom: 80px;
+margin: 1rem 0 80px;
 }
 
 .details-grid {

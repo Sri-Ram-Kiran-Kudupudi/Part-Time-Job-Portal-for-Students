@@ -12,7 +12,7 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
 
     Optional<Applicant> findByUser(User user);
 
-    // ⭐ Find applicant using USER ID
+    // Find applicant using USER ID
     Optional<Applicant> findByUser_Id(Long userId);
 
     // DELETE APPLICANT BY USER ID (correct!)

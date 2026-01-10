@@ -24,7 +24,7 @@ public class ChatRoom {
     @OneToOne(mappedBy = "chatRoom", fetch = FetchType.LAZY)
     @JsonIgnore
     private JobApplication jobApplication;
-    // ⭐ ADD THIS ⭐
+
     @OneToMany(
             mappedBy = "chatRoom",    //If ChatRoom is deleted → Messages are deleted
             cascade = CascadeType.ALL,
@@ -33,3 +33,8 @@ public class ChatRoom {
     @JsonIgnore
     private List<ChatMessage> messages = new ArrayList<>();
 }
+
+
+//One ChatRoom → Many Messages
+//If ChatRoom deleted → messages automatically deleted
+//orphanRemoval = true ensures no garbage messages remainOne ChatRoom → Many Messages

@@ -23,7 +23,7 @@ public class JobProviderController {
     @PreAuthorize("hasRole('PROVIDER')")
     @PostMapping("/jobs")
     public ResponseEntity<?> createJob(@RequestBody JobRequest request,
-                                       @AuthenticationPrincipal CustomUserDetails user) {
+                                       @AuthenticationPrincipal CustomUserDetails user) { //Gets currently logged-in user
         return ResponseEntity.ok(jobService.createJob(request, user.getId()));
     }
 

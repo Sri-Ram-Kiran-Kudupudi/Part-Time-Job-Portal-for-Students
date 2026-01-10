@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class ApplyJobRequest {
-    private String message;         // seeker message
+    private String message;
 }

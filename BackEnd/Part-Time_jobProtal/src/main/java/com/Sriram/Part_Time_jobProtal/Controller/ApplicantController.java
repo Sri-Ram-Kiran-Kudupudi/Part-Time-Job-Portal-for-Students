@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.*;
 public class ApplicantController {
 
     private final ApplicantService applicantService;
-    private final ApplicantRepository applicantRepository;
+    private final ApplicantRepository applicantRepository; //controller directly talks with repo or db
 
-    // ⭐ Get applicant profile using USER ID
+    //  Get applicant profile using USER ID
     @GetMapping("/{userId}")
     public ResponseEntity<ApplicantDTO> getApplicant(@PathVariable Long userId) {
         return ResponseEntity.ok(applicantService.getApplicantById(userId));
     }
 
-    // ⭐ Update seeker profile using USER ID
+    // Update seeker profile using USER ID
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateApplicant(
             @PathVariable Long userId,

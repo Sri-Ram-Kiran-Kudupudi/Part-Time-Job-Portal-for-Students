@@ -80,7 +80,7 @@ public class JobServiceImpl implements JobService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
-        if (!job.getProviderId().equals(providerId)) {
+        if (!job.getProviderId().equals(providerId)) {//preventing un authenticate users
             throw new UnauthorizedException("You cannot modify this job");
         }
 
@@ -106,10 +106,10 @@ public class JobServiceImpl implements JobService {
             throw new UnauthorizedException("You cannot delete this job");
         }
 
-        // 1️⃣ delete applications first
+        // 1️ delete applications first do preventing foreign key contrient issues
         applicationRepository.deleteByJob_Id(jobId);
 
-        // 2️⃣ delete job
+        // 2 delete job
         jobRepository.delete(job);
     }
 
@@ -122,7 +122,7 @@ public class JobServiceImpl implements JobService {
                         type == null ? null : type.trim().toLowerCase(),
                         salary
                 )
-                .stream().map(this::toDto).collect(Collectors.toList());
+                .stream().map(this::toDto).collect(Collectors.toList());//For each Job entity → converts to JobResponse then convert stream to list
     }
 
     @Transactional(readOnly = true)
@@ -132,14 +132,15 @@ public class JobServiceImpl implements JobService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
-        // ✅ PROVIDER OWNERSHIP CHECK
+        // 1 PROVIDER OWNERSHIP CHECK
         if (!job.getProviderId().equals(providerId)) {
             throw new UnauthorizedException("You cannot access this job");
         }
-
+        //Fetch Applications for This Job
         List<JobApplication> apps =
                 applicationRepository.findByJobAndHiddenFromProviderFalse(job);
 
+        //This code converts each application object into a DTO and collects them into a new list.
         List<ProviderApplicantDTO> applicantDTOs = apps.stream().map(app -> {
 
             Long chatId = app.getChatRoom() != null
@@ -153,7 +154,7 @@ public class JobServiceImpl implements JobService {
                     .applicantId(applicant.getId())
                     .userId(applicant.getUser().getId())
                     .name(applicant.getUser().getFullName())
-                    .age(applicant.getAge() != null ? applicant.getAge() : 0) // ✅ NULL SAFE
+                    .age(applicant.getAge() != null ? applicant.getAge() : 0)
                     .status(app.getStatus())
                     .chatId(chatId)
                     .build();
@@ -170,5 +171,15 @@ public class JobServiceImpl implements JobService {
                 .applicants(applicantDTOs)
                 .build();
     }
+                    /*
+                    This method
+                    ✔ Takes jobId and providerId
+                    ✔ Checks:
+                    whether job exists
+                    whether job belongs to that provider
+                    ✔ Gets all applicants applied to that job
+                    ✔ Converts them into DTO format
+                    ✔ Returns job + applicants list together
+                     */
 
 }

@@ -1,24 +1,8 @@
-/* =====================================
-   JOB CARD – PRODUCTION UI
-   Black • Blue • Purple Accent
-===================================== */
-
-/* -----------------------------
-   1. Link Wrapper (FIX underline issue)
------------------------------- */
 .job-card-link {
     display: block;
     text-decoration: none;
     color: inherit;
 }
-
-.job-card-link:hover {
-    text-decoration: none;
-}
-
-/* -----------------------------
-   2. Card Container
------------------------------- */
 .job-card {
     background: #ffffff;
     padding: 1.25rem;
@@ -34,6 +18,11 @@
     box-shadow: 0 16px 30px rgba(37,99,235,0.25);
 }
 
+/* Small tactile feel on mobile click */
+.job-card:active {
+    transform: scale(0.98);
+}
+
 /* -----------------------------
    3. Job Title
 ------------------------------ */
@@ -45,7 +34,7 @@
 }
 
 /* -----------------------------
-   4. Location
+   4. Location Row
 ------------------------------ */
 .job-meta-row {
     margin-bottom: 0.6rem;
@@ -68,7 +57,7 @@
     border-top: 1px solid #e5e7eb;
 }
 
-/* Salary (NO GREEN ❌) */
+/* Salary */
 .job-salary {
     font-size: 1.05rem;
     font-weight: 700;
@@ -84,11 +73,6 @@
 /* -----------------------------
    6. Job Type Tag
 ------------------------------ */
-
-
-/* -----------------------------
-   6. Job Type Tag (SUBTLE)
------------------------------- */
 .job-type-row {
     margin-top: 0.6rem;
 }
@@ -96,17 +80,25 @@
 .job-type-tag {
     display: inline-block;
 
-    font-size: 0.68rem;        /* 🔽 smaller text */
+    font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.25px;
 
-    padding: 3px 8px;          /* 🔽 smaller padding */
+    padding: 3px 8px;
     border-radius: 999px;
 
-    background: #f8fafc;       /* very light */
-    color: #475569;            /* muted gray-blue */
+    background: #f8fafc;
+    color: #475569;
 
     border: 1px solid #e2e8f0;
+}
+
+/* Remove underline on hover, focus, active */
+.job-card-link:hover,
+.job-card-link:focus,
+.job-card-link:active {
+    text-decoration: none;
+    color: inherit;
 }
 
 /* -----------------------------

@@ -6,46 +6,67 @@ import { getJobById } from "../../service/api";
 
 const DetailItem = ({ label, value }) => (
   <div className="detail-item">
-    <div>
-      <p className="detail-label">{label}</p>
-      <p className="detail-value">{value}</p>
-    </div>
+    <p className="detail-label">{label}</p>
+    <p className="detail-value">{value}</p>
   </div>
 );
 
 const JobDetailsPage = () => {
   const { jobId } = useParams();
   const navigate = useNavigate();
+
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const loadJob = async () => {
       try {
         const res = await getJobById(jobId);
+
         const { address, ...jobData } = res.data;
-        setJob({ ...jobData, location: address || "No location specified" });
+        setJob({
+          ...jobData,
+          location: address || "No location specified",
+        });
       } catch (err) {
         console.error("Job load error:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
+
     loadJob();
   }, [jobId]);
 
-  if (loading || !job) return (
-    <div className="app-background min-h-screen">
-      <main className="job-details-container"><p>Loading...</p></main>
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="app-background">
+        <main className="job-details-container">
+          <p>Loading...</p>
+        </main>
+      </div>
+    );
+
+  if (error || !job)
+    return (
+      <div className="app-background">
+        <main className="job-details-container">
+          <p>Unable to load job details.</p>
+          <button className="btn btn-primary" onClick={() => navigate(-1)}>
+            Go Back
+          </button>
+        </main>
+      </div>
+    );
 
   return (
     <div className="app-background">
-      {/* FIXED BACK BUTTON */}
-     <button onClick={() => navigate(-1)} className="back-floating-btn">
-  <IoArrowBack size={22} color="black" />
-</button>
-
+      {/* Fixed Back Button */}
+      <button onClick={() => navigate(-1)} className="back-floating-btn">
+        <IoArrowBack size={22} color="black" />
+      </button>
 
       <main className="job-details-container">
         <div className="details-card card shadow-md">
@@ -58,8 +79,8 @@ const JobDetailsPage = () => {
             <DetailItem label="Salary" value={job.salary} />
           </div>
 
-          <button 
-            className="btn btn-primary w-full mt-4 apply-now-clickable" 
+          <button
+            className="btn btn-primary w-full mt-4 apply-now-clickable"
             onClick={() => navigate(`/job/${jobId}/apply`)}
           >
             Apply Now

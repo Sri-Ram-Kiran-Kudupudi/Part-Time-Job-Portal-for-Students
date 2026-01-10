@@ -8,3 +8,6 @@ public class OtpUtil {
         return String.valueOf(100000 + new Random().nextInt(900000));
     }
 }
+
+
+//100000 + if random= 899999 = 999999

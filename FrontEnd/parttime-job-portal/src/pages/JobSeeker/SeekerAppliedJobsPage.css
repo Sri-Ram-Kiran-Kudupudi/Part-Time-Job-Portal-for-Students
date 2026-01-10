@@ -118,7 +118,6 @@
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
-    margin: left -1px;;
     align-self: flex-start; /* no left space */
 }
 
@@ -176,15 +175,6 @@
     border: none;
     cursor: pointer;
 }
-
-/* ===============================
-   CHAT BADGE
-================================ */
-.chat-btn {
-    position: relative;
-}
-
-
 
 /* ===============================
    MODAL

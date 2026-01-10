@@ -21,7 +21,6 @@ public class ApplicationResponse {
     private String providerName;
     private String providerEmail;
 
-    // ⭐ NEW FIELD — required for chat feature
     private Long chatId;
 
     public static ApplicationResponse fromEntity(JobApplication app, User provider) {
@@ -42,7 +41,7 @@ public class ApplicationResponse {
             dto.setProviderEmail(provider.getEmail());
         }
 
-        // ⭐ ADD CHAT ID HERE
+        //  ADD CHAT ID HERE
         if (app.getChatRoom() != null) {
             dto.setChatId(app.getChatRoom().getId());
         } else {

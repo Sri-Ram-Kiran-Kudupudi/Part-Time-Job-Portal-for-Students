@@ -14,3 +14,10 @@ public interface EmailOtpRepository extends JpaRepository<EmailOtp, Long> {
     @Transactional
     void deleteByEmail(String email);
 }
+
+
+//SELECT * FROM email_otp
+//WHERE email = ?
+//ORDER BY id DESC
+//LIMIT 1;
+//Get the most recent OTP for this email

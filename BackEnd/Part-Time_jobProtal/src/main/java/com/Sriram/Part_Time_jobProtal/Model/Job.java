@@ -5,6 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+
+//Represents a job posted by provider
+
 @Entity
 @Table(name = "jobs")
 @Data
@@ -27,10 +30,10 @@ public class Job {
 
     private String address;
 
-    private Double latitude;   // ⭐ NEW
-    private Double longitude;  // ⭐ NEW
+    private Double latitude;
+    private Double longitude;
 
-    private Long providerId;
+    private Long providerId; //I am not uses ManyToOne beacuse we only need ID and also impooves performance
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

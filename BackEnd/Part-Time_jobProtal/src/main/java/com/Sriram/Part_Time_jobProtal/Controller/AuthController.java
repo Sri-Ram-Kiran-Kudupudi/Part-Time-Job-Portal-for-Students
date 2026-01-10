@@ -39,16 +39,17 @@ public class AuthController {
     }
     @Transactional
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOtp(@RequestBody Map<String, String> request) {
+    public ResponseEntity<String> verifyOtp(@RequestBody Map<String, String> request) { //Map helps quickly read of email and otp
 
         String email = request.get("email");
         String otp = request.get("otp");
 
         EmailOtp savedOtp = emailOtpRepository
-                .findTopByEmailOrderByIdDesc(email)
+                .findTopByEmailOrderByIdDesc(email) //Gets most recent OTP or  Find OTP row with this email Order by id descending (latest first) Pick top 1
                 .orElseThrow(() -> new UnauthorizedException("OTP not found"));
 
         if (savedOtp.getExpiresAt().isBefore(LocalDateTime.now())) {
+           // If expiresAt is BEFORE current time → OTP expired
             throw new UnauthorizedException("OTP expired");
         }
 
@@ -56,22 +57,21 @@ public class AuthController {
             throw new UnauthorizedException("Invalid OTP");
         }
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)  //you save user at register page but enabled=false
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        user.setEnabled(true);
+        user.setEnabled(true); //User can now login and Account is activated
         userRepository.save(user);
 
-        // 🔥 safer cleanup
-        emailOtpRepository.deleteByEmail(email);
+        // safer cleanup
+        emailOtpRepository.deleteByEmail(email);//OTP should not be reused so deleted once used
 
         return ResponseEntity.ok("Email verified successfully");
     }
 
 
-
     @Transactional
-    @PostMapping("/resend-otp")
+    @PostMapping("/resend-otp") //for sending the otp i uses the post
     public ResponseEntity<String> resendOtp(@RequestBody Map<String, String> request) {
 
         String email = request.get("email");
@@ -83,7 +83,7 @@ public class AuthController {
             throw new UnauthorizedException("Email already verified");
         }
 
-        // ✅ Now safe
+        // deleting the old otp,
         emailOtpRepository.deleteByEmail(email);
 
         String otp = OtpUtil.generateOtp();
@@ -91,7 +91,7 @@ public class AuthController {
         EmailOtp emailOtp = EmailOtp.builder()
                 .email(email)
                 .otp(otp)
-                .expiresAt(LocalDateTime.now().plusMinutes(5))
+                .expiresAt(LocalDateTime.now().plusMinutes(2))
                 .build();
 
         emailOtpRepository.save(emailOtp);
@@ -103,3 +103,5 @@ public class AuthController {
 
 
 }
+// if you uses @RequiredArgsConstructor
+//then Lombok automatically creates a constructor for final fields.

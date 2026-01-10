@@ -27,9 +27,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    // -----------------------------------------------------------
     // APPLY FOR A JOB
-    // -----------------------------------------------------------
     @Override
     public ApplicationResponse applyForJob(Long jobId, Long userId, ApplyJobRequest request) {
 

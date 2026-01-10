@@ -6,25 +6,26 @@ import "./JobCard.css";
 const JobCard = ({ job }) => {
   if (!job) return null;
 
+  const { id, title, address, salary, timing, type } = job;
 
-   const { id, title, address, salary, timing, type } = job;
-
-const location = address || "No location";
+  const location = address || "No location";
 
   const formatSalary = (value) => {
     if (!value) return "Not specified";
-    if (!value.includes("₹")) return `₹${value}`;
-    return value;
+
+    const str = String(value);
+
+    return str.includes("₹") ? str : `₹${str}`;
   };
 
   return (
     <Link to={`/job/${id}`} className="job-card-link">
       <div className="job-card">
-        
+
         <h3 className="job-title">{title || "Untitled Job"}</h3>
 
         <div className="job-meta-row">
-          <span className="job-location">{location || "Location not provided"}</span>
+          <span className="job-location">{location}</span>
         </div>
 
         <div className="job-details-row">

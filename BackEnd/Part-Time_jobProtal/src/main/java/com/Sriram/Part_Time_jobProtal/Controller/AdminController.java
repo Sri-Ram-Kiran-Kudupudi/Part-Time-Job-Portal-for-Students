@@ -23,15 +23,10 @@ public class AdminController {
     public ResponseEntity<List<SeekerResponse>> getAllSeekers() {
         return ResponseEntity.ok(adminService.getAllSeekers());
     }
-
     @DeleteMapping("/seekers/{id}")
     public ResponseEntity<?> deleteSeeker(@PathVariable Long id) {
-        try {
-            adminService.deleteSeeker(id);
-            return ResponseEntity.ok("Seeker deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
-        }
+        adminService.deleteSeeker(id);
+        return ResponseEntity.ok("Seeker deleted successfully");
     }
 
     @GetMapping("/providers")
@@ -41,12 +36,8 @@ public class AdminController {
 
     @DeleteMapping("/providers/{id}")
     public ResponseEntity<?> deleteProvider(@PathVariable Long id) {
-        try {
-            adminService.deleteProvider(id);
-            return ResponseEntity.ok("Provider deleted successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(400).body(e.getMessage());
-        }
+        adminService.deleteProvider(id);
+        return ResponseEntity.ok("Provider deleted successfully");
     }
 
     @GetMapping("/applications")
